@@ -41,8 +41,8 @@ export type Address = {
   addressLine1: string;
   addressLine2: string | null;
   city: string;
-  state: string;
-  lga: string | null;
+  region: string;
+  district: string | null;
   landmark: string | null;
   isDefault: boolean;
   createdAt: Date;

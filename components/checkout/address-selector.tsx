@@ -81,8 +81,8 @@ export function AddressSelector({
                   {address.addressLine2 && `, ${address.addressLine2}`}
                 </p>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  {address.city}, {address.state}
-                  {address.lga && ` (${address.lga})`}
+                  {address.city}, {address.region}
+                  {address.district && ` (${address.district})`}
                 </p>
                 {address.landmark && (
                   <p className="text-sm text-neutral-500">

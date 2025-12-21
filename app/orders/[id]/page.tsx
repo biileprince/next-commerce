@@ -127,8 +127,13 @@ export default async function OrderDetailPage({
                 </p>
               )}
               <p className="text-neutral-600 dark:text-neutral-400">
-                {order.address.city}, {order.address.state}
+                {order.address.city}, {order.address.region}
               </p>
+              {order.address.district && (
+                <p className="text-neutral-500">
+                  District: {order.address.district}
+                </p>
+              )}
               {order.address.landmark && (
                 <p className="text-neutral-500">
                   Landmark: {order.address.landmark}

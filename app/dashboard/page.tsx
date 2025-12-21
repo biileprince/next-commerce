@@ -188,7 +188,7 @@ export default async function DashboardPage() {
                     )}
                   </div>
                   <p className="mt-1 text-xs text-neutral-500">
-                    {address.city}, {address.state}
+                    {address.city}, {address.region}
                   </p>
                 </div>
               ))}

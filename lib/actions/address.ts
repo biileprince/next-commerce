@@ -56,8 +56,8 @@ export async function createAddress(data: {
   addressLine1: string;
   addressLine2?: string;
   city: string;
-  state: string;
-  lga?: string;
+  region: string;
+  district?: string;
   landmark?: string;
   isDefault?: boolean;
 }) {
@@ -104,8 +104,8 @@ export async function updateAddress(
     addressLine1?: string;
     addressLine2?: string;
     city?: string;
-    state?: string;
-    lga?: string;
+    region?: string;
+    district?: string;
     landmark?: string;
     isDefault?: boolean;
   }

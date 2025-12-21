@@ -1,8 +1,8 @@
 export const SITE_NAME = "NextCommerse";
 export const SITE_DESCRIPTION = "Your African E-Commerce Platform";
 
-export const DEFAULT_CURRENCY = "NGN";
-export const SHIPPING_COST = 2000; // Fixed shipping for MVP
+export const DEFAULT_CURRENCY = "GHS";
+export const SHIPPING_COST = 20; // Fixed shipping for MVP (GHS 20)
 
 export const MENU_ITEMS = [
   { title: "All Products", path: "/products" },

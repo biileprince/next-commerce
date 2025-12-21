@@ -81,7 +81,7 @@ model Product {
   slug              String    @unique
   description       String?   @db.Text
   price             Decimal   @db.Decimal(10, 2)
-  currency          String    @default("NGN")
+  currency          String    @default("GHS")
   stockQuantity     Int       @default(0)
   images            String[]  // Array of image URLs
   isActive          Boolean   @default(true)
@@ -134,9 +134,9 @@ model Address {
   addressLine1      String
   addressLine2      String?
   city              String
-  state             String
-  lga               String?   // Local Government Area
-  landmark          String?   // "Behind yellow mosque"
+  region            String    // Ghana regions (e.g., Greater Accra, Ashanti)
+  district          String?   // District or Municipality
+  landmark          String?   // Notable landmark
   isDefault         Boolean   @default(false)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -159,7 +159,7 @@ model Order {
   subtotal          Decimal   @db.Decimal(10, 2)
   shippingCost      Decimal   @db.Decimal(10, 2)
   totalAmount       Decimal   @db.Decimal(10, 2)
-  currency          String    @default("NGN")
+  currency          String    @default("GHS")
   
   // Payment
   paymentMethod     String    // "card", "bank_transfer", "mobile_money", "ussd"

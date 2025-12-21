@@ -26,8 +26,8 @@ export function AddressForm({
       addressLine1: formData.get("addressLine1") as string,
       addressLine2: (formData.get("addressLine2") as string) || undefined,
       city: formData.get("city") as string,
-      state: formData.get("state") as string,
-      lga: (formData.get("lga") as string) || undefined,
+      region: formData.get("region") as string,
+      district: (formData.get("district") as string) || undefined,
       landmark: (formData.get("landmark") as string) || undefined,
       isDefault: formData.get("isDefault") === "on",
     };
@@ -80,7 +80,7 @@ export function AddressForm({
             id="phoneNumber"
             name="phoneNumber"
             required
-            placeholder="+234..."
+            placeholder="+233..."
             className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm focus:border-black focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-white"
           />
         </div>
@@ -132,26 +132,44 @@ export function AddressForm({
         </div>
 
         <div>
-          <label htmlFor="state" className="mb-2 block text-sm font-medium">
-            State *
+          <label htmlFor="region" className="mb-2 block text-sm font-medium">
+            Region *
           </label>
-          <input
-            type="text"
-            id="state"
-            name="state"
+          <select
+            id="region"
+            name="region"
             required
             className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm focus:border-black focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-white"
-          />
+          >
+            <option value="">Select Region</option>
+            <option value="Greater Accra">Greater Accra</option>
+            <option value="Ashanti">Ashanti</option>
+            <option value="Western">Western</option>
+            <option value="Eastern">Eastern</option>
+            <option value="Central">Central</option>
+            <option value="Volta">Volta</option>
+            <option value="Northern">Northern</option>
+            <option value="Upper East">Upper East</option>
+            <option value="Upper West">Upper West</option>
+            <option value="Bono">Bono</option>
+            <option value="Bono East">Bono East</option>
+            <option value="Ahafo">Ahafo</option>
+            <option value="Savannah">Savannah</option>
+            <option value="North East">North East</option>
+            <option value="Oti">Oti</option>
+            <option value="Western North">Western North</option>
+          </select>
         </div>
 
         <div>
-          <label htmlFor="lga" className="mb-2 block text-sm font-medium">
-            LGA
+          <label htmlFor="district" className="mb-2 block text-sm font-medium">
+            District
           </label>
           <input
             type="text"
-            id="lga"
-            name="lga"
+            id="district"
+            name="district"
+            placeholder="E.g., Accra Metropolitan"
             className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm focus:border-black focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-white"
           />
         </div>
@@ -165,7 +183,7 @@ export function AddressForm({
           type="text"
           id="landmark"
           name="landmark"
-          placeholder="E.g., Behind yellow mosque"
+          placeholder="E.g., Near Kantamanto Market"
           className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm focus:border-black focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-white"
         />
       </div>

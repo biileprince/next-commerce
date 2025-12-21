@@ -66,9 +66,9 @@ export function AddressCard({ address }: { address: Address }) {
         <p>{address.addressLine1}</p>
         {address.addressLine2 && <p>{address.addressLine2}</p>}
         <p>
-          {address.city}, {address.state}
+          {address.city}, {address.region}
         </p>
-        {address.lga && <p>LGA: {address.lga}</p>}
+        {address.district && <p>District: {address.district}</p>}
         {address.landmark && <p>Landmark: {address.landmark}</p>}
         <p className="pt-2">{address.phoneNumber}</p>
       </div>

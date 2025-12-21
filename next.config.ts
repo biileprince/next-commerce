@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  // Using webpack instead of Turbopack for Windows compatibility
+
 };
 
 export default nextConfig;

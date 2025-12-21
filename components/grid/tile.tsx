@@ -10,6 +10,9 @@ interface GridTileImageProps {
     amount: number;
     currencyCode: string;
     position?: "bottom" | "center";
+    originalPrice?: number | null;
+    rating?: number | null;
+    reviewCount?: number | null;
   };
   src?: string | null;
   alt: string;
@@ -33,38 +36,42 @@ export function GridTileImage({
   return (
     <div
       className={cn(
-        "group flex h-full w-full items-center justify-center overflow-hidden rounded-lg border bg-white hover:border-blue-600 dark:bg-black",
+        "group relative flex h-full w-full flex-col overflow-hidden rounded-lg border bg-white transition-all hover:shadow-lg dark:bg-neutral-950",
         {
-          relative: label,
-          "border-2 border-blue-600": active,
+          "border-2 border-blue-500": active,
           "border-neutral-200 dark:border-neutral-800": !active,
         },
         className
       )}
     >
-      {src ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill={fill}
-          sizes={sizes}
-          priority={priority}
-          className={cn("relative h-full w-full object-cover", {
-            "transition duration-300 ease-in-out group-hover:scale-105":
-              isInteractive,
-          })}
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-900">
-          <span className="text-4xl text-neutral-400">📦</span>
-        </div>
-      )}
+      <div className="relative aspect-square w-full">
+        {src ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill={fill}
+            sizes={sizes}
+            priority={priority}
+            className={cn("relative h-full w-full object-contain p-4", {
+              "transition duration-300 ease-in-out group-hover:scale-105":
+                isInteractive,
+            })}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-neutral-50 dark:bg-neutral-900">
+            <span className="text-4xl text-neutral-400">📦</span>
+          </div>
+        )}
+      </div>
       {label && (
         <ProductLabel
           title={label.title}
           amount={label.amount}
           currencyCode={label.currencyCode}
           position={label.position}
+          originalPrice={label.originalPrice}
+          rating={label.rating}
+          reviewCount={label.reviewCount}
         />
       )}
     </div>

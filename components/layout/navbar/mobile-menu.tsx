@@ -1,67 +1,120 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { Menu, ChevronDown } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { Search } from "./search";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface MenuItem {
   title: string;
   path: string;
 }
 
-export function MobileMenu({ menu }: { menu: MenuItem[] }) {
-  const [isOpen, setIsOpen] = useState(false);
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+export function MobileMenu({
+  menu,
+  categories,
+}: {
+  menu: MenuItem[];
+  categories?: Category[];
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const pathname = usePathname();
+
   const closeMenu = () => setIsOpen(false);
+  const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+    setIsCategoriesOpen(false);
+  }, [pathname]);
 
   return (
-    <>
-      <button
-        onClick={toggleMenu}
-        aria-label="Open mobile menu"
-        className="flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-black transition-colors dark:border-neutral-700 dark:text-white md:hidden"
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>
+        <button
+          aria-label="Open mobile menu"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-black transition-colors hover:bg-neutral-100 dark:border-neutral-800 dark:text-white dark:hover:bg-neutral-900"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </SheetTrigger>
+
+      <SheetContent
+        side="left"
+        className="flex h-full w-[280px] flex-col bg-white/95 backdrop-blur-xl dark:bg-black/95 sm:w-[320px]"
       >
-        <Menu className="h-4" />
-      </button>
+        <SheetHeader>
+          <SheetTitle className="text-lg font-semibold">Menu</SheetTitle>
+        </SheetHeader>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm md:hidden">
-          <div className="fixed bottom-0 left-0 right-0 top-0 flex h-full w-full flex-col bg-white pb-6 dark:bg-black">
-            <div className="flex items-center justify-between p-4">
-              <span className="text-lg font-medium">Menu</span>
-              <button onClick={closeMenu} aria-label="Close mobile menu">
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="mb-4 w-full px-4">
-              <Search />
-            </div>
-
-            {menu.length > 0 && (
-              <ul className="flex flex-col">
-                {menu.map((item) => (
-                  <li
-                    key={item.title}
-                    className="border-b border-neutral-200 dark:border-neutral-700"
-                  >
-                    <Link
-                      href={item.path}
-                      prefetch={true}
-                      onClick={closeMenu}
-                      className="block p-4 text-xl text-black transition-colors hover:text-neutral-500 dark:text-white"
-                    >
-                      {item.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+        {/* Menu Items - Scrollable */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden">
+          <ul className="flex flex-col">
+            {/* Categories Accordion */}
+            {categories && categories.length > 0 && (
+              <li>
+                <button
+                  onClick={toggleCategories}
+                  className="flex w-full items-center justify-between border-b border-neutral-200 px-4 py-4 text-base font-medium text-black transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:text-white dark:hover:bg-neutral-900"
+                >
+                  <span>Categories</span>
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform duration-200 ${
+                      isCategoriesOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {isCategoriesOpen && (
+                  <ul className="bg-neutral-50 dark:bg-neutral-900/50">
+                    {categories.map((category) => (
+                      <li key={category.id}>
+                        <Link
+                          href={`/search?category=${category.slug}`}
+                          prefetch={true}
+                          onClick={closeMenu}
+                          className="block border-b border-neutral-200 py-3 pl-8 pr-4 text-sm text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-900"
+                        >
+                          {category.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
             )}
-          </div>
-        </div>
-      )}
-    </>
+
+            {/* Regular Menu Items */}
+            {menu.length > 0 &&
+              menu.map((item) => (
+                <li key={item.title}>
+                  <Link
+                    href={item.path}
+                    prefetch={true}
+                    onClick={closeMenu}
+                    className="block border-b border-neutral-200 px-4 py-4 text-base font-medium text-black transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:text-white dark:hover:bg-neutral-900"
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </nav>
+      </SheetContent>
+    </Sheet>
   );
 }

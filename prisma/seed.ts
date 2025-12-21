@@ -4,6 +4,71 @@ import prisma from "../lib/prisma";
 async function main() {
   console.log("🌱 Starting database seed...");
 
+  // Seed Categories first
+  const existingCategories = await prisma.category.count();
+
+  if (existingCategories === 0) {
+    const categories = [
+      {
+        name: "Electronics",
+        slug: "electronics",
+        description: "Phones, laptops, TVs, and electronic accessories",
+        isActive: true,
+      },
+      {
+        name: "Fashion",
+        slug: "fashion",
+        description: "Clothing, shoes, bags, and fashion accessories",
+        isActive: true,
+      },
+      {
+        name: "Home & Living",
+        slug: "home",
+        description: "Furniture, home decor, kitchen, and appliances",
+        isActive: true,
+      },
+      {
+        name: "Beauty & Health",
+        slug: "beauty",
+        description: "Skincare, makeup, fragrances, and health products",
+        isActive: true,
+      },
+      {
+        name: "Sports & Outdoors",
+        slug: "sports",
+        description: "Sporting equipment, fitness gear, and outdoor activities",
+        isActive: true,
+      },
+      {
+        name: "Toys & Games",
+        slug: "toys",
+        description: "Toys, games, and entertainment for kids",
+        isActive: true,
+      },
+    ];
+
+    await prisma.category.createMany({
+      data: categories,
+    });
+
+    console.log(`✅ Created ${categories.length} categories`);
+  } else {
+    console.log(
+      `ℹ️  Database already has ${existingCategories} categories. Skipping category creation.`
+    );
+  }
+
+  // Get category IDs for product association
+  const electronicsCategory = await prisma.category.findUnique({
+    where: { slug: "electronics" },
+  });
+  const fashionCategory = await prisma.category.findUnique({
+    where: { slug: "fashion" },
+  });
+  const homeCategory = await prisma.category.findUnique({
+    where: { slug: "home" },
+  });
+
   // Check if products already exist
   const existingProducts = await prisma.product.count();
 
@@ -20,11 +85,12 @@ async function main() {
           slug: "wireless-bluetooth-headphones",
           description:
             "Premium wireless headphones with noise cancellation, 30-hour battery life, and superior sound quality. Perfect for music lovers and professionals.",
-          price: 45000,
-          currency: "NGN",
+          price: 450,
+          currency: "GHS",
           stockQuantity: 50,
           images: ["/products/headphones-1.jpg"],
           isActive: true,
+          categoryId: electronicsCategory?.id,
         },
       }),
       prisma.product.create({
@@ -33,11 +99,12 @@ async function main() {
           slug: "smart-fitness-watch",
           description:
             "Track your health and fitness goals with this advanced smartwatch. Features heart rate monitoring, GPS, sleep tracking, and 100+ workout modes.",
-          price: 35000,
-          currency: "NGN",
+          price: 350,
+          currency: "GHS",
           stockQuantity: 30,
           images: ["/products/watch-1.jpg"],
           isActive: true,
+          categoryId: electronicsCategory?.id,
         },
       }),
       prisma.product.create({
@@ -46,8 +113,8 @@ async function main() {
           slug: "portable-power-bank-20000mah",
           description:
             "High-capacity power bank with fast charging technology. Charge multiple devices simultaneously with dual USB ports and USB-C.",
-          price: 12000,
-          currency: "NGN",
+          price: 120,
+          currency: "GHS",
           stockQuantity: 100,
           images: ["/products/powerbank-1.jpg"],
           isActive: true,
@@ -193,11 +260,11 @@ async function main() {
     data: {
       userId: testUser.id,
       fullName: "Test User",
-      phoneNumber: "+2348012345678",
+      phoneNumber: "+233244123456",
       addressLine1: "123 Test Street",
-      city: "Lagos",
-      state: "Lagos",
-      lga: "Ikeja",
+      city: "Accra",
+      region: "Greater Accra",
+      district: "Accra Metropolitan",
       landmark: "Near Test Landmark",
       isDefault: true,
     },

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { Navbar } from "@/components/layout/navbar";
 import { CartProvider } from "@/components/cart/cart-context";
@@ -8,14 +8,16 @@ import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import { baseUrl } from "@/lib/utils";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const geistMono = Inter({
   subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -48,14 +50,14 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-50 text-black selection:bg-teal-300 dark:bg-neutral-900 dark:text-white dark:selection:bg-pink-500 dark:selection:text-white`}
+        className={`${inter.variable} ${geistMono.variable} h-full font-sans antialiased bg-white text-black selection:bg-blue-200 dark:bg-neutral-950 dark:text-white dark:selection:bg-blue-800`}
       >
         <CartProvider initialCart={initialCart}>
           <Navbar />
-          <main>{children}</main>
-          <Toaster closeButton />
+          <main className="min-h-[calc(100vh-73px)]">{children}</main>
+          <Toaster closeButton position="top-right" />
         </CartProvider>
       </body>
     </html>

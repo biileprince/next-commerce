@@ -29,9 +29,9 @@ export const FOOTER_LINKS = {
 } as const;
 
 export const SORT_OPTIONS = [
-  { name: "Relevance", slug: "relevance" },
-  { name: "Trending", slug: "trending" },
-  { name: "Latest", slug: "newest" },
-  { name: "Price: Low to high", slug: "price-asc" },
-  { name: "Price: High to low", slug: "price-desc" },
+  { title: "Relevance", slug: null },
+  { title: "Trending", slug: "trending" },
+  { title: "Latest arrivals", slug: "newest" },
+  { title: "Price: Low to high", slug: "price-asc" },
+  { title: "Price: High to low", slug: "price-desc" },
 ] as const;

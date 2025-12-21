@@ -13,6 +13,15 @@ export type Product = {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  categoryId?: string | null;
+  category?: { id: string; name: string; slug: string } | null;
+  // Optional fields for enhancements
+  originalPrice?: number | null;
+  discountPercentage?: number | null;
+  rating?: number | null;
+  reviewCount?: number | null;
+  isTop?: boolean;
+  isNew?: boolean;
 };
 
 export type CartItem = {
@@ -83,11 +92,24 @@ export type OrderItem = {
 
 // Helper function to convert Prisma models to client types
 export function convertProduct(
-  product: Prisma.ProductGetPayload<object>
+  product: Prisma.ProductGetPayload<{ include?: { category: true } }>
 ): Product {
   return {
     ...product,
     price: product.price.toNumber(),
+    originalPrice: product.originalPrice?.toNumber() ?? null,
+    rating: product.rating?.toNumber() ?? null,
+    reviewCount: product.reviewCount ?? 0,
+    isTop: product.isTop ?? false,
+    isNew: product.isNew ?? false,
+    categoryId: product.categoryId ?? null,
+    category: product.category
+      ? {
+          id: product.category.id,
+          name: product.category.name,
+          slug: product.category.slug,
+        }
+      : null,
   };
 }
 

@@ -2,7 +2,6 @@ import { getProducts } from "@/lib/actions/product";
 import { Suspense } from "react";
 import { Grid } from "@/components/grid";
 import { ProductGridItems } from "@/components/product/product-grid-items";
-import { FilterList } from "@/components/product/filter-list";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata = {
@@ -23,7 +22,7 @@ function SearchSkeleton() {
 async function SearchResults({
   searchParams,
 }: {
-  searchParams: { q?: string; sort?: string };
+  searchParams: { q?: string; sort?: string; category?: string };
 }) {
   const result = await getProducts();
 
@@ -36,6 +35,11 @@ async function SearchResults({
   }
 
   let products = result.data;
+
+  // Filter by category (placeholder - would need category field in database)
+  if (searchParams.category) {
+    // TODO: Implement category filtering when category field is added to products
+  }
 
   // Filter by search query
   if (searchParams.q) {
@@ -91,37 +95,28 @@ async function SearchResults({
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; sort?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; category?: string }>;
 }) {
   const params = await searchParams;
 
   return (
-    <div className="mx-auto max-w-screen-2xl px-4 py-8">
-      <div className="mb-8">
-        {params.q ? (
-          <>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Search results for &quot;{params.q}&quot;
-            </h1>
-            <p className="mt-2 text-neutral-500">
-              Showing products matching your search
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-3xl font-bold tracking-tight">All Products</h1>
-            <p className="mt-2 text-neutral-500">
-              Browse our entire collection
-            </p>
-          </>
-        )}
-      </div>
-
-      <FilterList />
+    <>
+      {params.q && (
+        <div className="mb-4">
+          <p className="text-lg">
+            {params.q.length > 0 ? (
+              <>
+                Searching for{" "}
+                <span className="font-semibold">&quot;{params.q}&quot;</span>
+              </>
+            ) : null}
+          </p>
+        </div>
+      )}
 
       <Suspense fallback={<SearchSkeleton />}>
         <SearchResults searchParams={params} />
       </Suspense>
-    </div>
+    </>
   );
 }

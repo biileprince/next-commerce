@@ -75,25 +75,50 @@ model Verification {
   @@map("verification")
 }
 
+model Category {
+  id                String    @id @default(cuid())
+  name              String    @unique
+  slug              String    @unique
+  description       String?
+  image             String?   // Category banner image
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  products          Product[]
+  
+  @@index([slug])
+  @@map("categories")
+}
+
 model Product {
   id                String    @id @default(cuid())
   name              String
   slug              String    @unique
   description       String?   @db.Text
   price             Decimal   @db.Decimal(10, 2)
+  originalPrice     Decimal?  @db.Decimal(10, 2) // For showing discounts
   currency          String    @default("GHS")
   stockQuantity     Int       @default(0)
   images            String[]  // Array of image URLs
   isActive          Boolean   @default(true)
+  categoryId        String?
+  rating            Decimal?  @db.Decimal(2, 1) // 0.0 to 5.0
+  reviewCount       Int       @default(0)
+  isTop             Boolean   @default(false) // Top/Featured product
+  isNew             Boolean   @default(false) // New arrival
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   
   // Relations
+  category          Category? @relation(fields: [categoryId], references: [id])
   cartItems         CartItem[]
   orderItems        OrderItem[]
   
   @@index([slug])
   @@index([isActive])
+  @@index([categoryId])
   @@map("products")
 }
 

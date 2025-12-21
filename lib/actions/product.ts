@@ -11,6 +11,7 @@ export async function getProducts() {
   try {
     const products = await prisma.product.findMany({
       where: { isActive: true },
+      include: { category: true },
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: products.map(convertProduct) };
@@ -25,6 +26,7 @@ export async function getProductBySlug(slug: string) {
   try {
     const product = await prisma.product.findUnique({
       where: { slug, isActive: true },
+      include: { category: true },
     });
 
     if (!product) {
@@ -35,6 +37,25 @@ export async function getProductBySlug(slug: string) {
   } catch (error) {
     console.error("Error fetching product:", error);
     return { success: false, error: "Failed to fetch product" };
+  }
+}
+
+// Get products by category
+export async function getProductsByCategory(
+  categoryId: string,
+  limit?: number
+) {
+  try {
+    const products = await prisma.product.findMany({
+      where: { categoryId, isActive: true },
+      include: { category: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    return { success: true, data: products.map(convertProduct) };
+  } catch (error) {
+    console.error("Error fetching products by category:", error);
+    return { success: false, error: "Failed to fetch products" };
   }
 }
 

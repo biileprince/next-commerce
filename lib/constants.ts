@@ -32,6 +32,14 @@ export const SORT_OPTIONS = [
   { title: "Relevance", slug: null, path: "/products" },
   { title: "Trending", slug: "trending", path: "/products?sort=trending" },
   { title: "Latest arrivals", slug: "newest", path: "/products?sort=newest" },
-  { title: "Price: Low to high", slug: "price-asc", path: "/products?sort=price-asc" },
-  { title: "Price: High to low", slug: "price-desc", path: "/products?sort=price-desc" },
+  {
+    title: "Price: Low to high",
+    slug: "price-asc",
+    path: "/products?sort=price-asc",
+  },
+  {
+    title: "Price: High to low",
+    slug: "price-desc",
+    path: "/products?sort=price-desc",
+  },
 ] as const;

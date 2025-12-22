@@ -1,5 +1,6 @@
 import "dotenv/config";
 import prisma from "../lib/prisma";
+import bcrypt from "bcryptjs";
 
 async function main() {
   console.log("🌱 Starting database seed...");
@@ -254,6 +255,72 @@ async function main() {
   });
 
   console.log(`✅ Created test user: ${testUser.email}`);
+
+  // Create admin user with password (admin@gmail.com / Admin@1234)
+  // Check if admin already exists
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: "admin@gmail.com" },
+  });
+
+  // Better Auth uses bcrypt with cost factor 10
+  const hashedPassword = await bcrypt.hash("Admin@1234", 10);
+
+  let adminUser;
+  if (existingAdmin) {
+    console.log(`ℹ️  Admin user already exists: ${existingAdmin.email}`);
+    adminUser = existingAdmin;
+
+    // Update role if not set
+    if (existingAdmin.role !== "admin") {
+      adminUser = await prisma.user.update({
+        where: { id: existingAdmin.id },
+        data: { role: "admin" },
+      });
+      console.log(`✅ Updated role to admin for: ${adminUser.email}`);
+    }
+
+    // Update/create account entry with correct password hash
+    await prisma.account.upsert({
+      where: {
+        id: `${adminUser.id}-credential`,
+      },
+      update: {
+        password: hashedPassword,
+      },
+      create: {
+        id: `${adminUser.id}-credential`,
+        userId: adminUser.id,
+        accountId: adminUser.id,
+        providerId: "credential",
+        password: hashedPassword,
+      },
+    });
+    console.log(`✅ Updated admin password hash`);
+  } else {
+    adminUser = await prisma.user.create({
+      data: {
+        email: "admin@gmail.com",
+        name: "Admin User",
+        emailVerified: true,
+        role: "admin",
+      },
+    });
+
+    // Create account entry with hashed password
+    await prisma.account.create({
+      data: {
+        id: `${adminUser.id}-credential`,
+        userId: adminUser.id,
+        accountId: adminUser.id,
+        providerId: "credential",
+        password: hashedPassword,
+      },
+    });
+
+    console.log(
+      `✅ Created admin user: ${adminUser.email} (role: admin, password: Admin@1234)`
+    );
+  }
 
   // Create a test address for the user
   const testAddress = await prisma.address.create({

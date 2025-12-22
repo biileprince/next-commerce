@@ -55,7 +55,20 @@ export const auth = betterAuth({
       },
     }),
   ],
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "customer",
+        required: false,
+      },
+    },
+  },
   trustedOrigins: ["http://localhost:3000", "http://localhost:3001"],
 });
 
-export type Session = typeof auth.$Infer.Session;
+export type Session = typeof auth.$Infer.Session & {
+  user: typeof auth.$Infer.Session.user & {
+    role?: string;
+  };
+};

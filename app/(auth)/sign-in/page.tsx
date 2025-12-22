@@ -20,10 +20,15 @@ export default function SignInPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
 
-  // Check if already logged in
+  // Check if already logged in and redirect based on role
   useEffect(() => {
     if (session && !isPending) {
-      router.push("/products");
+      const user = session.user as typeof session.user & { role?: string };
+      if (user.role === "admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/products");
+      }
     }
   }, [session, isPending, router]);
 
@@ -64,9 +69,18 @@ export default function SignInPage() {
           password,
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             setSuccess("Signed in successfully!");
-            setTimeout(() => router.push("/products"), 500);
+            // Fetch fresh session to get role
+            const { data } = await authClient.getSession();
+            if (data?.user) {
+              const user = data.user as typeof data.user & { role?: string };
+              const redirectPath =
+                user.role === "admin" ? "/admin/dashboard" : "/products";
+              setTimeout(() => router.push(redirectPath), 500);
+            } else {
+              setTimeout(() => router.push("/products"), 500);
+            }
           },
           onError: (ctx) => {
             setError(ctx.error.message || "Invalid email or password");
@@ -79,8 +93,6 @@ export default function SignInPage() {
       setLoading(false);
     }
   }
-
-
 
   // Phone with password login
   async function handlePhonePasswordLogin(e: React.FormEvent) {
@@ -95,9 +107,18 @@ export default function SignInPage() {
           password: phonePassword,
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             setSuccess("Signed in successfully!");
-            setTimeout(() => router.push("/products"), 500);
+            // Fetch fresh session to get role
+            const { data } = await authClient.getSession();
+            if (data?.user) {
+              const user = data.user as typeof data.user & { role?: string };
+              const redirectPath =
+                user.role === "admin" ? "/admin/dashboard" : "/products";
+              setTimeout(() => router.push(redirectPath), 500);
+            } else {
+              setTimeout(() => router.push("/products"), 500);
+            }
           },
           onError: (ctx) => {
             setError(ctx.error.message || "Invalid phone number or password");

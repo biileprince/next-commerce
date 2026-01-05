@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { convertProduct } from "@/types";
+import { Prisma } from "@prisma/client";
 
 // Get all active products
 export async function getProducts() {
@@ -18,6 +19,115 @@ export async function getProducts() {
   } catch (error) {
     console.error("Error fetching products:", error);
     return { success: false, error: "Failed to fetch products" };
+  }
+}
+
+// Admin: Get all products with filters, search, sort, and pagination
+export async function getAdminProducts({
+  page = 1,
+  limit = 10,
+  search = "",
+  categoryId = "",
+  stockStatus = "all",
+  sortBy = "createdAt",
+  sortOrder = "desc",
+}: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  categoryId?: string;
+  stockStatus?: "all" | "in_stock" | "low_stock" | "out_of_stock";
+  sortBy?: "createdAt" | "name" | "price" | "stockQuantity";
+  sortOrder?: "asc" | "desc";
+}) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Build where clause
+    const where: Prisma.ProductWhereInput = {
+      AND: [
+        // Search by name or description
+        search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { description: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {},
+        // Filter by category
+        categoryId ? { categoryId } : {},
+        // Filter by stock status
+        stockStatus === "in_stock"
+          ? { stockQuantity: { gt: 10 } }
+          : stockStatus === "low_stock"
+            ? { stockQuantity: { gte: 1, lte: 10 } }
+            : stockStatus === "out_of_stock"
+              ? { stockQuantity: 0 }
+              : {},
+      ],
+    };
+
+    // Get total count
+    const total = await prisma.product.count({ where });
+
+    // Get products
+    const products = await prisma.product.findMany({
+      where,
+      include: { category: true },
+      orderBy: { [sortBy]: sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      success: true,
+      data: products.map(convertProduct),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching admin products:", error);
+    return { success: false, error: "Failed to fetch products" };
+  }
+}
+
+// Admin: Get single product by ID (for editing)
+export async function getAdminProduct(id: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: { category: true },
+    });
+
+    if (!product) {
+      return { success: false, error: "Product not found" };
+    }
+
+    return { success: true, data: convertProduct(product) };
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return { success: false, error: "Failed to fetch product" };
   }
 }
 
@@ -60,34 +170,54 @@ export async function getProductsByCategory(
 }
 
 // Admin: Create product
-export async function createProduct(data: {
-  name: string;
-  slug: string;
-  description?: string;
-  price: number;
-  stockQuantity: number;
-  images?: string[];
-}) {
+export async function createProduct(formData: FormData) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
 
-    if (!session?.user) {
+    if (!session?.user || userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
+    }
+
+    const name = formData.get("name") as string;
+    const slug = formData.get("slug") as string;
+    const description = formData.get("description") as string;
+    const price = parseFloat(formData.get("price") as string);
+    const stockQuantity = parseInt(formData.get("stockQuantity") as string);
+    const categoryId = formData.get("categoryId") as string;
+    const images = formData.getAll("images") as string[];
+
+    if (!name || !slug || !price || stockQuantity === undefined) {
+      return { success: false, error: "Missing required fields" };
+    }
+
+    // Check if slug already exists
+    const existingProduct = await prisma.product.findUnique({
+      where: { slug },
+    });
+
+    if (existingProduct) {
+      return { success: false, error: "Product with this slug already exists" };
     }
 
     const product = await prisma.product.create({
       data: {
-        name: data.name,
-        slug: data.slug,
-        description: data.description,
-        price: data.price,
-        stockQuantity: data.stockQuantity,
-        images: data.images || [],
+        name,
+        slug,
+        description: description || null,
+        price,
+        stockQuantity,
+        categoryId: categoryId || null,
+        images: images.filter(Boolean),
       },
     });
 
     revalidatePath("/products");
-    return { success: true, data: product };
+    revalidatePath(`/products/${product.slug}`);
+    revalidatePath("/admin/products");
+    return { success: true, data: convertProduct(product) };
   } catch (error) {
     console.error("Error creating product:", error);
     return { success: false, error: "Failed to create product" };
@@ -95,33 +225,55 @@ export async function createProduct(data: {
 }
 
 // Admin: Update product
-export async function updateProduct(
-  id: string,
-  data: {
-    name?: string;
-    slug?: string;
-    description?: string;
-    price?: number;
-    stockQuantity?: number;
-    images?: string[];
-    isActive?: boolean;
-  }
-) {
+export async function updateProduct(id: string, formData: FormData) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
 
-    if (!session?.user) {
+    if (!session?.user || userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
+    }
+
+    const name = formData.get("name") as string;
+    const slug = formData.get("slug") as string;
+    const description = formData.get("description") as string;
+    const price = parseFloat(formData.get("price") as string);
+    const stockQuantity = parseInt(formData.get("stockQuantity") as string);
+    const categoryId = formData.get("categoryId") as string;
+    const images = formData.getAll("images") as string[];
+
+    if (!name || !slug || !price || stockQuantity === undefined) {
+      return { success: false, error: "Missing required fields" };
+    }
+
+    // Check if slug is taken by another product
+    const existingProduct = await prisma.product.findFirst({
+      where: { slug, NOT: { id } },
+    });
+
+    if (existingProduct) {
+      return { success: false, error: "Product with this slug already exists" };
     }
 
     const product = await prisma.product.update({
       where: { id },
-      data,
+      data: {
+        name,
+        slug,
+        description: description || null,
+        price,
+        stockQuantity,
+        categoryId: categoryId || null,
+        images: images.filter(Boolean),
+      },
     });
 
     revalidatePath("/products");
     revalidatePath(`/products/${product.slug}`);
-    return { success: true, data: product };
+    revalidatePath("/admin/products");
+    return { success: true, data: convertProduct(product) };
   } catch (error) {
     console.error("Error updating product:", error);
     return { success: false, error: "Failed to update product" };
@@ -132,8 +284,11 @@ export async function updateProduct(
 export async function deleteProduct(id: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
 
-    if (!session?.user) {
+    if (!session?.user || userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -143,9 +298,41 @@ export async function deleteProduct(id: string) {
     });
 
     revalidatePath("/products");
+    revalidatePath("/admin/products");
     return { success: true };
   } catch (error) {
     console.error("Error deleting product:", error);
     return { success: false, error: "Failed to delete product" };
+  }
+}
+
+// Admin: Toggle product active status
+export async function toggleProductStatus(id: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (!product) {
+      return { success: false, error: "Product not found" };
+    }
+
+    await prisma.product.update({
+      where: { id },
+      data: { isActive: !product.isActive },
+    });
+
+    revalidatePath("/products");
+    revalidatePath("/admin/products");
+    return { success: true };
+  } catch (error) {
+    console.error("Error toggling product status:", error);
+    return { success: false, error: "Failed to toggle product status" };
   }
 }

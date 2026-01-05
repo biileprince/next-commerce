@@ -1,63 +1,39 @@
 import { requireAdmin } from "@/lib/middleware/admin";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { Separator } from "@/components/ui/separator";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Protect all admin routes
   const session = await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Admin Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="container flex h-16 items-center px-4">
-          <div className="flex items-center gap-8">
-            <Link href="/admin/dashboard" className="text-xl font-bold">
-              NextCommerse Admin
-            </Link>
-            <nav className="flex gap-1">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/admin/dashboard">Dashboard</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/admin/products">Products</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/admin/orders">Orders</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/admin/users">Users</Link>
-              </Button>
-            </nav>
+    <SidebarProvider>
+      <AdminSidebar
+        userName={session.user.name || undefined}
+        userEmail={session.user.email || undefined}
+      />
+      <SidebarInset className="overflow-x-hidden">
+        <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sm:h-16">
+          <div className="flex w-full items-center gap-2 px-3 sm:px-4">
+            <SidebarTrigger className="-ml-1 md:hidden" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <h1 className="text-base font-semibold truncate sm:text-lg">
+              Admin Panel
+            </h1>
           </div>
-          <div className="ml-auto flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {session.user.name}
-            </span>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/">View Store</Link>
-            </Button>
-            <form
-              action={async () => {
-                "use server";
-                redirect("/api/auth/signout");
-              }}
-            >
-              <Button type="submit" variant="outline" size="sm">
-                Logout
-              </Button>
-            </form>
-          </div>
-        </div>
-      </header>
-
-      {/* Admin Content */}
-      <main className="container mx-auto px-4 py-8">{children}</main>
-    </div>
+        </header>
+        <main className="flex flex-1 flex-col gap-4 overflow-x-hidden p-3 pt-4 sm:p-4 sm:pt-6">
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

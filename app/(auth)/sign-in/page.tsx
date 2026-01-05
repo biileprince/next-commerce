@@ -71,15 +71,17 @@ export default function SignInPage() {
         {
           onSuccess: async () => {
             setSuccess("Signed in successfully!");
+            // Small delay to ensure session is updated on server
+            await new Promise((resolve) => setTimeout(resolve, 300));
             // Fetch fresh session to get role
             const { data } = await authClient.getSession();
             if (data?.user) {
               const user = data.user as typeof data.user & { role?: string };
               const redirectPath =
                 user.role === "admin" ? "/admin/dashboard" : "/products";
-              setTimeout(() => router.push(redirectPath), 500);
+              setTimeout(() => router.push(redirectPath), 200);
             } else {
-              setTimeout(() => router.push("/products"), 500);
+              setTimeout(() => router.push("/products"), 200);
             }
           },
           onError: (ctx) => {
@@ -109,13 +111,24 @@ export default function SignInPage() {
         {
           onSuccess: async () => {
             setSuccess("Signed in successfully!");
+            // Small delay to ensure session is updated on server
+            await new Promise((resolve) => setTimeout(resolve, 300));
             // Fetch fresh session to get role
             const { data } = await authClient.getSession();
             if (data?.user) {
               const user = data.user as typeof data.user & { role?: string };
               const redirectPath =
                 user.role === "admin" ? "/admin/dashboard" : "/products";
-              setTimeout(() => router.push(redirectPath), 500);
+              setTimeout(() => router.push(redirectPath), 200);
+            } else {
+              setTimeout(() => router.push("/products"), 200);
+            }
+          },
+          onError: (ctx) => {
+            setError(ctx.error.message || "Invalid phone number or password");
+          },
+        }
+      );
             } else {
               setTimeout(() => router.push("/products"), 500);
             }

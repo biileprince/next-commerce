@@ -40,9 +40,9 @@ export async function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-neutral-800 dark:bg-neutral-950/95 dark:supports-[backdrop-filter]:bg-neutral-950/80">
       <div className="mx-auto max-w-screen-2xl">
-        <div className="relative flex items-center justify-between gap-4 px-4 py-3 lg:px-6">
+        <div className="relative flex items-center justify-between gap-2 px-4 py-3 lg:gap-4 lg:px-6">
           {/* Left Side - Hamburger (Mobile) + Logo + Menu (Desktop) */}
-          <div className="flex items-center gap-2 md:gap-4 lg:gap-6 md:flex-1 md:max-w-[45%]">
+          <div className="flex items-center gap-2 md:gap-4 lg:gap-6">
             {/* Mobile Hamburger - Always visible on mobile */}
             <div className="block flex-none md:hidden">
               <Suspense fallback={null}>
@@ -64,7 +64,7 @@ export async function Navbar() {
 
             {/* Desktop Menu */}
             {menu.length > 0 && (
-              <ul className="hidden gap-6 text-sm md:flex md:items-center">
+              <ul className="hidden gap-4 text-sm lg:flex lg:items-center xl:gap-6">
                 {menu.map((item) => (
                   <li key={item.title}>
                     <Link
@@ -81,14 +81,14 @@ export async function Navbar() {
           </div>
 
           {/* Center - Search (Desktop only) */}
-          <div className="hidden justify-center md:flex md:flex-1 md:max-w-md lg:max-w-lg">
+          <div className="hidden justify-center lg:flex lg:flex-1 lg:max-w-md xl:max-w-lg">
             <Suspense fallback={<SearchSkeleton />}>
               <Search />
             </Suspense>
           </div>
 
           {/* Right Side - Theme Toggle + User/Cart (Always visible) */}
-          <div className="flex items-center justify-end gap-2 md:flex-1 md:max-w-[35%]">
+          <div className="flex items-center justify-end gap-2">
             <ThemeToggle />
             {session?.user ? (
               <UserMenu userName={session.user.name || session.user.email} />

@@ -345,3 +345,214 @@ export async function retryPayment(orderId: string) {
     return { success: false, error: "Failed to retry payment" };
   }
 }
+
+// Admin: Get all orders with filters, search, and pagination
+export async function getAdminOrders({
+  page = 1,
+  limit = 10,
+  search = "",
+  status = "all",
+  paymentStatus = "all",
+  startDate = "",
+  endDate = "",
+  sortBy = "createdAt",
+  sortOrder = "desc",
+}: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  paymentStatus?: string;
+  startDate?: string;
+  endDate?: string;
+  sortBy?: "createdAt" | "totalAmount";
+  sortOrder?: "asc" | "desc";
+}) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & { role?: string };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Build where clause
+    const where: any = {
+      AND: [
+        // Search by order number
+        search
+          ? {
+              orderNumber: { contains: search, mode: "insensitive" },
+            }
+          : {},
+        // Filter by status
+        status !== "all" ? { orderStatus: status } : {},
+        // Filter by payment status
+        paymentStatus !== "all" ? { paymentStatus } : {},
+        // Filter by date range
+        startDate || endDate
+          ? {
+              createdAt: {
+                ...(startDate ? { gte: new Date(startDate) } : {}),
+                ...(endDate ? { lte: new Date(endDate) } : {}),
+              },
+            }
+          : {},
+      ],
+    };
+
+    // Get total count
+    const total = await prisma.order.count({ where });
+
+    // Get orders
+    const orders = await prisma.order.findMany({
+      where,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                images: true,
+              },
+            },
+          },
+        },
+        address: true,
+      },
+      orderBy: { [sortBy]: sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      success: true,
+      data: orders,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching admin orders:", error);
+    return { success: false, error: "Failed to fetch orders" };
+  }
+}
+
+// Admin: Get single order by ID
+export async function getAdminOrder(id: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & { role?: string };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                images: true,
+                price: true,
+              },
+            },
+          },
+        },
+        address: true,
+      },
+    });
+
+    if (!order) {
+      return { success: false, error: "Order not found" };
+    }
+
+    return { success: true, data: order };
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    return { success: false, error: "Failed to fetch order" };
+  }
+}
+
+// Admin: Update order status
+export async function updateOrderStatus(id: string, status: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & { role?: string };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const validStatuses = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return { success: false, error: "Invalid status" };
+    }
+
+    await prisma.order.update({
+      where: { id },
+      data: { orderStatus: status },
+    });
+
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${id}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return { success: false, error: "Failed to update order status" };
+  }
+}
+
+// Admin: Update payment status
+export async function updatePaymentStatus(id: string, paymentStatus: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & { role?: string };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const validStatuses = ["pending", "paid", "failed", "refunded"];
+    if (!validStatuses.includes(paymentStatus)) {
+      return { success: false, error: "Invalid payment status" };
+    }
+
+    await prisma.order.update({
+      where: { id },
+      data: { paymentStatus },
+    });
+
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${id}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    return { success: false, error: "Failed to update payment status" };
+  }
+}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ interface ProductFormProps {
 export function ProductForm({ categories, product }: ProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState<string[]>(product?.images || []);
   const [imageInput, setImageInput] = useState("");
 
@@ -55,6 +56,55 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       setImages([...images, imageInput.trim()]);
       setImageInput("");
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+
+    try {
+      // Convert files to base64
+      const base64Images: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const base64 = await fileToBase64(file);
+        base64Images.push(base64);
+      }
+
+      // Upload to Cloudinary
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ images: base64Images }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setImages([...images, ...result.urls]);
+        toast.success(`${result.urls.length} image(s) uploaded successfully`);
+      } else {
+        toast.error(result.error || "Failed to upload images");
+      }
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast.error("Failed to upload images");
+    } finally {
+      setUploading(false);
+      // Reset file input
+      e.target.value = "";
+    }
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   const removeImage = (index: number) => {
@@ -204,19 +254,53 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Product Images</h3>
 
-        {/* Add Image Input */}
+        {/* File Upload */}
+        <div className="space-y-2">
+          <Label htmlFor="file-upload">Upload Images</Label>
+          <div className="flex items-center gap-2">
+            <Input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileUpload}
+              disabled={uploading}
+              className="cursor-pointer"
+            />
+            {uploading && (
+              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Upload product images (JPEG, PNG, WebP). Multiple files supported.
+          </p>
+        </div>
+
+        {/* Or Add by URL */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or add by URL
+            </span>
+          </div>
+        </div>
+
         <div className="flex gap-2">
           <Input
             type="url"
             value={imageInput}
             onChange={(e) => setImageInput(e.target.value)}
             placeholder="Enter image URL"
+            disabled={uploading}
           />
           <Button
             type="button"
             variant="outline"
             onClick={addImage}
-            disabled={!imageInput.trim()}
+            disabled={!imageInput.trim() || uploading}
           >
             <Plus className="size-4" />
             <span className="ml-2">Add</span>
@@ -255,10 +339,14 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           </div>
         )}
 
-        <p className="text-xs text-muted-foreground">
-          Add product images by entering their URLs. The first image will be
-          used as the main product image.
-        </p>
+        {images.length === 0 && (
+          <div className="border-2 border-dashed rounded-lg p-8 text-center">
+            <Upload className="size-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-sm text-muted-foreground">
+              No images added yet. Upload files or add image URLs.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Submit Buttons */}
@@ -267,11 +355,11 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={loading}
+          disabled={loading || uploading}
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading || uploading}>
           {loading && <Loader2 className="size-4 animate-spin" />}
           <span className={loading ? "ml-2" : ""}>
             {isEdit ? "Update Product" : "Create Product"}

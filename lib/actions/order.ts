@@ -53,7 +53,7 @@ export async function createOrder(addressId: string) {
     // Calculate totals
     const subtotal = cart.items.reduce(
       (sum, item) => sum + Number(item.product.price) * item.quantity,
-      0
+      0,
     );
     const shippingCost = 2000; // Fixed shipping cost for MVP (NGN 2000)
     const totalAmount = subtotal + shippingCost;
@@ -370,7 +370,9 @@ export async function getAdminOrders({
 }) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & { role?: string };
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
 
     if (!session?.user || userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -454,7 +456,9 @@ export async function getAdminOrders({
 export async function getAdminOrder(id: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & { role?: string };
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
 
     if (!session?.user || userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -503,24 +507,44 @@ export async function getAdminOrder(id: string) {
 export async function updateOrderStatus(id: string, status: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & { role?: string };
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
 
     if (!session?.user || userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
-    const validStatuses = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+    const validStatuses = [
+      "pending",
+      "confirmed",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled",
+    ];
     if (!validStatuses.includes(status)) {
       return { success: false, error: "Invalid status" };
     }
 
+    // Prepare update data with timestamps
+    const updateData: Record<string, unknown> = { orderStatus: status };
+
+    // Auto-set timestamps based on status
+    if (status === "shipped") {
+      updateData.shippedAt = new Date();
+    } else if (status === "delivered") {
+      updateData.deliveredAt = new Date();
+    }
+
     await prisma.order.update({
       where: { id },
-      data: { orderStatus: status },
+      data: updateData,
     });
 
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${id}`);
+    revalidatePath("/dashboard/orders");
     return { success: true };
   } catch (error) {
     console.error("Error updating order status:", error);
@@ -532,7 +556,9 @@ export async function updateOrderStatus(id: string, status: string) {
 export async function updatePaymentStatus(id: string, paymentStatus: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & { role?: string };
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
 
     if (!session?.user || userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };

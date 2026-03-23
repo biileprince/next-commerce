@@ -26,6 +26,30 @@ export async function getAddresses() {
   }
 }
 
+// Get single address by ID
+export async function getAddress(addressId: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const address = await prisma.address.findUnique({
+      where: { id: addressId },
+    });
+
+    if (!address || address.userId !== session.user.id) {
+      return { success: false, error: "Address not found" };
+    }
+
+    return { success: true, data: address };
+  } catch (error) {
+    console.error("Error fetching address:", error);
+    return { success: false, error: "Failed to fetch address" };
+  }
+}
+
 // Get default address
 export async function getDefaultAddress() {
   try {
@@ -88,6 +112,7 @@ export async function createAddress(data: {
 
     revalidatePath("/checkout");
     revalidatePath("/addresses");
+    revalidatePath("/dashboard/addresses");
     return { success: true, data: address };
   } catch (error) {
     console.error("Error creating address:", error);
@@ -108,7 +133,7 @@ export async function updateAddress(
     district?: string;
     landmark?: string;
     isDefault?: boolean;
-  }
+  },
 ) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -145,6 +170,7 @@ export async function updateAddress(
 
     revalidatePath("/checkout");
     revalidatePath("/addresses");
+    revalidatePath("/dashboard/addresses");
     return { success: true, data: address };
   } catch (error) {
     console.error("Error updating address:", error);
@@ -176,6 +202,7 @@ export async function deleteAddress(addressId: string) {
 
     revalidatePath("/checkout");
     revalidatePath("/addresses");
+    revalidatePath("/dashboard/addresses");
     return { success: true };
   } catch (error) {
     console.error("Error deleting address:", error);
@@ -218,6 +245,7 @@ export async function setDefaultAddress(addressId: string) {
 
     revalidatePath("/checkout");
     revalidatePath("/addresses");
+    revalidatePath("/dashboard/addresses");
     return { success: true };
   } catch (error) {
     console.error("Error setting default address:", error);

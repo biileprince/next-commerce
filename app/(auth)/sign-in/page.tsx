@@ -129,15 +129,6 @@ export default function SignInPage() {
           },
         }
       );
-            } else {
-              setTimeout(() => router.push("/products"), 500);
-            }
-          },
-          onError: (ctx) => {
-            setError(ctx.error.message || "Invalid phone number or password");
-          },
-        }
-      );
     } catch {
       setError("An unexpected error occurred");
     } finally {

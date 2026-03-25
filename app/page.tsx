@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { ThreeItemGrid } from "@/components/grid/three-items";
 import { Carousel } from "@/components/carousel";
+import { CategoriesSection } from "@/components/categories-section";
 import { Footer } from "@/components/layout/footer";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -43,6 +44,26 @@ function CarouselSkeleton() {
   );
 }
 
+function CategoriesSkeleton() {
+  return (
+    <section className="mx-auto max-w-screen-2xl px-4 py-8">
+      <Skeleton className="mb-8 h-10 w-48" />
+      <div className="space-y-12">
+        {[1, 2].map((i) => (
+          <div key={i} className="space-y-4">
+            <Skeleton className="h-8 w-32" />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {[1, 2, 3, 4].map((j) => (
+                <Skeleton key={j} className="aspect-square rounded-lg" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
@@ -51,6 +72,9 @@ export default function HomePage() {
       </Suspense>
       <Suspense fallback={<CarouselSkeleton />}>
         <Carousel />
+      </Suspense>
+      <Suspense fallback={<CategoriesSkeleton />}>
+        <CategoriesSection />
       </Suspense>
       <Footer />
     </>

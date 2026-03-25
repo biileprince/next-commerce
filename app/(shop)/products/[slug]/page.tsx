@@ -7,6 +7,7 @@ import { ProductDescription } from "@/components/product/product-description";
 import { StockIndicator } from "@/components/product/stock-indicator";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ProductRating } from "@/components/product/product-rating";
+import { Footer } from "@/components/layout/footer";
 import { formatPrice } from "@/lib/utils";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -64,6 +65,7 @@ export default async function ProductDetailPage({
   ];
 
   return (
+    <>
     <div className="mx-auto max-w-screen-2xl px-4 py-8">
       {/* Breadcrumb Navigation */}
       <Breadcrumb items={breadcrumbItems} />
@@ -186,5 +188,8 @@ export default async function ProductDetailPage({
         />
       </Suspense>
     </div>
+
+    <Footer />
+  </>
   );
 }

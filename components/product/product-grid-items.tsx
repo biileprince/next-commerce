@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { GridTileImage } from "@/components/grid/tile";
 import { Product } from "@/types";
-import { ProductBadge } from "@/components/product/product-badge";
+import { ProductBadge, ProductBadges } from "@/components/product/product-badge";
 
 export function ProductGridItems({ products }: { products: Product[] }) {
   return (
@@ -17,6 +17,31 @@ export function ProductGridItems({ products }: { products: Product[] }) {
             )
           : 0;
 
+        // Determine which badge to show (priority: sold-out > database badges > discount > isTop > isNew)
+        const renderBadge = () => {
+          if (product.stockQuantity === 0) {
+            return <ProductBadge type="sold-out" />;
+          }
+
+          // Show database badges if available
+          if (product.badges && product.badges.length > 0) {
+            return <ProductBadges badges={product.badges} stockQuantity={product.stockQuantity} />;
+          }
+
+          // Fallback to computed badges
+          if (hasDiscount) {
+            return <ProductBadge type="discount" value={discountPercentage} />;
+          }
+          if (product.isTop) {
+            return <ProductBadge type="top" />;
+          }
+          if (product.isNew) {
+            return <ProductBadge type="new" />;
+          }
+
+          return null;
+        };
+
         return (
           <div
             key={product.id}
@@ -28,15 +53,7 @@ export function ProductGridItems({ products }: { products: Product[] }) {
               prefetch={true}
             >
               {/* Badges */}
-              {product.stockQuantity === 0 ? (
-                <ProductBadge type="sold-out" />
-              ) : product.isTop ? (
-                <ProductBadge type="top" />
-              ) : hasDiscount ? (
-                <ProductBadge type="discount" value={discountPercentage} />
-              ) : product.isNew ? (
-                <ProductBadge type="new" />
-              ) : null}
+              {renderBadge()}
 
               <GridTileImage
                 alt={product.name}

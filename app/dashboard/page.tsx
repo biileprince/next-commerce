@@ -164,7 +164,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">
-              {formatPrice(totalSpent, "NGN")}
+              {formatPrice(totalSpent, "GHS")}
             </div>
           </CardContent>
         </Card>

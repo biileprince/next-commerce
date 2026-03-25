@@ -1,5 +1,14 @@
 import { Prisma } from "@prisma/client";
 
+// Badge type for product display
+export type Badge = {
+  id: string;
+  name: string;
+  label: string;
+  color: string;
+  textColor: string;
+};
+
 // Convert Prisma Decimal to number for client-side usage
 export type Product = {
   id: string;
@@ -22,6 +31,8 @@ export type Product = {
   reviewCount?: number | null;
   isTop?: boolean;
   isNew?: boolean;
+  // Product badges
+  badges?: Badge[];
 };
 
 export type CartItem = {
@@ -94,6 +105,16 @@ export type OrderItem = {
 export function convertProduct(
   product: Prisma.ProductGetPayload<object> & {
     category?: { id: string; name: string; slug: string } | null;
+    badges?: Array<{
+      badge: {
+        id: string;
+        name: string;
+        label: string;
+        color: string;
+        textColor: string;
+        isActive: boolean;
+      };
+    }>;
   },
 ): Product {
   return {
@@ -112,6 +133,15 @@ export function convertProduct(
           slug: product.category.slug,
         }
       : null,
+    badges: product.badges
+      ?.filter((b) => b.badge.isActive)
+      .map((b) => ({
+        id: b.badge.id,
+        name: b.badge.name,
+        label: b.badge.label,
+        color: b.badge.color,
+        textColor: b.badge.textColor,
+      })) ?? [],
   };
 }
 

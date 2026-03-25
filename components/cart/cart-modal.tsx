@@ -53,7 +53,7 @@ export function CartModal() {
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCart}>
-      <SheetContent className="flex h-full flex-col bg-white/95 backdrop-blur-xl dark:bg-black/95 sm:max-w-lg">
+      <SheetContent className="flex h-full w-full flex-col bg-white/95 backdrop-blur-xl dark:bg-black/95 sm:max-w-lg">
         <SheetHeader>
           <SheetTitle className="text-lg font-semibold">
             My Cart ({totalQuantity})
@@ -61,19 +61,19 @@ export function CartModal() {
         </SheetHeader>
 
         {!cart || cart.items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center">
-            <ShoppingCart className="h-16 w-16 text-neutral-400" />
-            <p className="mt-6 text-center text-2xl font-bold">
+          <div className="flex flex-1 flex-col items-center justify-center px-4">
+            <ShoppingCart className="h-12 w-12 text-neutral-400 sm:h-16 sm:w-16" />
+            <p className="mt-4 text-center text-xl font-bold sm:mt-6 sm:text-2xl">
               Your cart is empty.
             </p>
-            <Button onClick={closeCart} className="mt-6" asChild>
+            <Button onClick={closeCart} className="mt-4 sm:mt-6" asChild>
               <Link href="/products">Continue Shopping</Link>
             </Button>
           </div>
         ) : (
           <div className="flex h-full flex-col justify-between overflow-hidden">
             {/* Cart Items */}
-            <ul className="flex-1 overflow-auto py-4">
+            <ul className="flex-1 overflow-auto py-4 px-1">
               {cart.items
                 .sort((a, b) => a.product.name.localeCompare(b.product.name))
                 .map((item) => {
@@ -84,73 +84,86 @@ export function CartModal() {
                       key={item.id}
                       className="flex w-full flex-col border-b border-neutral-200 py-4 dark:border-neutral-700"
                     >
-                      <div className="relative flex w-full flex-row justify-between px-1">
-                        <div className="flex flex-row gap-4">
-                          {/* Product Image */}
-                          <div className="relative h-16 w-16 overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900">
-                            {item.product.images?.[0] ? (
-                              <Image
-                                src={item.product.images[0]}
-                                alt={item.product.name}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center">
-                                <ShoppingCart className="h-6 w-6 text-neutral-400" />
-                              </div>
-                            )}
-                          </div>
+                      {/* Mobile: Stack layout, Desktop: Row layout */}
+                      <div className="flex gap-3 sm:gap-4">
+                        {/* Product Image */}
+                        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 sm:h-16 sm:w-16">
+                          {item.product.images?.[0] ? (
+                            <Image
+                              src={item.product.images[0]}
+                              alt={item.product.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <ShoppingCart className="h-6 w-6 text-neutral-400" />
+                            </div>
+                          )}
+                        </div>
 
-                          {/* Product Info */}
-                          <div className="flex flex-1 flex-col text-sm">
+                        {/* Product Info + Controls */}
+                        <div className="flex min-w-0 flex-1 flex-col gap-2">
+                          {/* Product Name and Price */}
+                          <div className="flex-1">
                             <Link
                               href={`/products/${item.product.slug}`}
                               onClick={closeCart}
-                              className="font-medium hover:underline"
+                              className="line-clamp-2 text-sm font-medium hover:underline"
                             >
                               {item.product.name}
                             </Link>
-                            <p className="text-neutral-500">
+                            <p className="mt-0.5 text-sm text-neutral-500">
                               {formatPrice(
                                 item.product.price,
                                 item.product.currency
                               )}
                             </p>
                           </div>
-                        </div>
 
-                        {/* Quantity Controls */}
-                        <div className="flex h-9 flex-row items-center rounded-full border border-neutral-200 dark:border-neutral-700">
-                          <button
-                            onClick={() =>
-                              handleUpdateQuantity(item.id, item.quantity - 1)
-                            }
-                            disabled={item.quantity <= 1 || isLoading}
-                            className="flex h-full min-w-[36px] items-center justify-center px-2 transition-all hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </button>
-                          <p className="w-6 text-center text-sm">
-                            {isLoading ? <LoadingDots /> : item.quantity}
-                          </p>
-                          <button
-                            onClick={() =>
-                              handleUpdateQuantity(item.id, item.quantity + 1)
-                            }
-                            disabled={
-                              item.quantity >= item.product.stockQuantity ||
-                              isLoading
-                            }
-                            className="flex h-full min-w-[36px] items-center justify-center px-2 transition-all hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </button>
+                          {/* Quantity Controls and Subtotal - Mobile: Below info */}
+                          <div className="flex items-center justify-between gap-2">
+                            {/* Quantity Controls */}
+                            <div className="flex h-8 flex-row items-center rounded-full border border-neutral-200 dark:border-neutral-700">
+                              <button
+                                onClick={() =>
+                                  handleUpdateQuantity(item.id, item.quantity - 1)
+                                }
+                                disabled={item.quantity <= 1 || isLoading}
+                                className="flex h-full min-w-[32px] items-center justify-center rounded-l-full px-2 transition-all hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
+                              >
+                                <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </button>
+                              <p className="w-8 text-center text-sm">
+                                {isLoading ? <LoadingDots /> : item.quantity}
+                              </p>
+                              <button
+                                onClick={() =>
+                                  handleUpdateQuantity(item.id, item.quantity + 1)
+                                }
+                                disabled={
+                                  item.quantity >= item.product.stockQuantity ||
+                                  isLoading
+                                }
+                                className="flex h-full min-w-[32px] items-center justify-center rounded-r-full px-2 transition-all hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
+                              >
+                                <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </button>
+                            </div>
+
+                            {/* Subtotal */}
+                            <p className="text-sm font-semibold">
+                              {formatPrice(
+                                item.product.price * item.quantity,
+                                item.product.currency
+                              )}
+                            </p>
+                          </div>
                         </div>
                       </div>
 
                       {/* Remove Button */}
-                      <div className="mt-2 flex justify-between">
+                      <div className="mt-2 flex justify-start pl-[92px] sm:pl-[80px]">
                         <button
                           onClick={() => handleRemove(item.id)}
                           disabled={isLoading}
@@ -159,12 +172,6 @@ export function CartModal() {
                           <Trash2 className="h-3 w-3" />
                           Remove
                         </button>
-                        <p className="text-sm font-medium">
-                          {formatPrice(
-                            item.product.price * item.quantity,
-                            item.product.currency
-                          )}
-                        </p>
                       </div>
                     </li>
                   );
@@ -172,12 +179,12 @@ export function CartModal() {
             </ul>
 
             {/* Cart Summary */}
-            <div className="border-t border-neutral-200 pt-4 dark:border-neutral-700">
-              <div className="mb-3 flex items-center justify-between text-sm">
+            <div className="border-t border-neutral-200 px-1 pt-4 dark:border-neutral-700">
+              <div className="mb-2 flex items-center justify-between text-sm">
                 <p className="text-neutral-500">Subtotal</p>
                 <p>{formatPrice(totalAmount)}</p>
               </div>
-              <div className="mb-3 flex items-center justify-between text-sm">
+              <div className="mb-2 flex items-center justify-between text-sm">
                 <p className="text-neutral-500">Shipping</p>
                 <p>{formatPrice(SHIPPING_COST)}</p>
               </div>
@@ -194,7 +201,7 @@ export function CartModal() {
 
               <button
                 onClick={closeCart}
-                className="mt-2 w-full text-center text-sm text-neutral-500 hover:text-black dark:hover:text-white"
+                className="mt-2 w-full pb-2 text-center text-sm text-neutral-500 hover:text-black dark:hover:text-white"
               >
                 Continue Shopping
               </button>

@@ -3,6 +3,10 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { updateCartItem, removeFromCart, clearCart } from "@/lib/actions/cart";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
+import { SHIPPING_COST } from "@/lib/constants";
 
 type CartItem = {
   id: string;
@@ -10,6 +14,7 @@ type CartItem = {
   product: {
     id: string;
     name: string;
+    slug: string;
     price: number;
     stockQuantity: number;
     images: string[];
@@ -86,76 +91,91 @@ export function CartContent({ initialCart }: { initialCart: Cart }) {
     0
   );
 
-  const shippingCost = 2000; // Fixed shipping for MVP
-  const total = subtotal + shippingCost;
+  const total = subtotal + SHIPPING_COST;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
       {/* Cart Items */}
-      <div className="lg:col-span-2 space-y-4">
+      <div className="space-y-4 lg:col-span-2">
         {optimisticCart.map((item) => (
           <div
             key={item.id}
-            className="border rounded-lg p-4 flex gap-4 bg-white shadow-sm"
+            className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-950 sm:flex-row"
           >
             {/* Product Image */}
-            <div className="w-24 h-24 bg-gray-200 rounded flex-shrink-0">
-              {/* Placeholder for image */}
+            <div className="relative mx-auto h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900 sm:mx-0 sm:h-24 sm:w-24">
+              {item.product.images?.[0] ? (
+                <Image
+                  src={item.product.images[0]}
+                  alt={item.product.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <ShoppingCart className="h-8 w-8 text-neutral-400" />
+                </div>
+              )}
             </div>
 
             {/* Product Details */}
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg">{item.product.name}</h3>
-              <p className="text-gray-600 mt-1">
-                {item.product.currency} {item.product.price.toFixed(2)}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                {item.product.stockQuantity > 0
-                  ? `${item.product.stockQuantity} in stock`
-                  : "Out of stock"}
-              </p>
+            <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:justify-between">
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="font-semibold">{item.product.name}</h3>
+                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                  {formatPrice(item.product.price, item.product.currency)}
+                </p>
+                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                  {item.product.stockQuantity > 0
+                    ? `${item.product.stockQuantity} in stock`
+                    : "Out of stock"}
+                </p>
+              </div>
 
-              {/* Quantity Controls */}
-              <div className="flex items-center gap-3 mt-3">
+              {/* Quantity Controls and Total */}
+              <div className="flex flex-col items-center gap-3 sm:items-end">
+                {/* Quantity Controls */}
+                <div className="flex h-9 items-center rounded-full border border-neutral-200 dark:border-neutral-700">
+                  <button
+                    onClick={() =>
+                      handleUpdateQuantity(item.id, item.quantity - 1)
+                    }
+                    disabled={item.quantity <= 1 || isPending}
+                    className="flex h-full w-9 items-center justify-center rounded-l-full transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-neutral-800"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-10 text-center text-sm font-medium">
+                    {item.quantity}
+                  </span>
+                  <button
+                    onClick={() =>
+                      handleUpdateQuantity(item.id, item.quantity + 1)
+                    }
+                    disabled={
+                      item.quantity >= item.product.stockQuantity || isPending
+                    }
+                    className="flex h-full w-9 items-center justify-center rounded-r-full transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-neutral-800"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Item Total */}
+                <p className="text-lg font-semibold">
+                  {formatPrice(item.product.price * item.quantity, item.product.currency)}
+                </p>
+
+                {/* Remove Button */}
                 <button
-                  onClick={() =>
-                    handleUpdateQuantity(item.id, item.quantity - 1)
-                  }
-                  disabled={item.quantity <= 1 || isPending}
-                  className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => handleRemove(item.id)}
+                  disabled={isPending}
+                  className="flex items-center gap-1 text-sm text-red-600 hover:underline disabled:opacity-50"
                 >
-                  -
-                </button>
-                <span className="w-12 text-center font-medium">
-                  {item.quantity}
-                </span>
-                <button
-                  onClick={() =>
-                    handleUpdateQuantity(item.id, item.quantity + 1)
-                  }
-                  disabled={
-                    item.quantity >= item.product.stockQuantity || isPending
-                  }
-                  className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  +
+                  <Trash2 className="h-4 w-4" />
+                  Remove
                 </button>
               </div>
-            </div>
-
-            {/* Item Total & Remove */}
-            <div className="text-right flex flex-col justify-between">
-              <p className="font-semibold text-lg">
-                {item.product.currency}{" "}
-                {(item.product.price * item.quantity).toFixed(2)}
-              </p>
-              <button
-                onClick={() => handleRemove(item.id)}
-                disabled={isPending}
-                className="text-red-600 text-sm hover:underline disabled:opacity-50"
-              >
-                Remove
-              </button>
             </div>
           </div>
         ))}
@@ -164,7 +184,7 @@ export function CartContent({ initialCart }: { initialCart: Cart }) {
         <button
           onClick={handleClearCart}
           disabled={isClearing || isPending}
-          className="text-red-600 text-sm hover:underline disabled:opacity-50"
+          className="text-sm text-red-600 hover:underline disabled:opacity-50"
         >
           {isClearing ? "Clearing..." : "Clear Cart"}
         </button>
@@ -172,34 +192,34 @@ export function CartContent({ initialCart }: { initialCart: Cart }) {
 
       {/* Order Summary */}
       <div className="lg:col-span-1">
-        <div className="border rounded-lg p-6 bg-white shadow-sm sticky top-4">
-          <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+        <div className="sticky top-4 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
+          <h2 className="mb-4 text-xl font-bold">Order Summary</h2>
 
-          <div className="space-y-3 mb-4">
+          <div className="mb-4 space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Subtotal</span>
-              <span className="font-medium">NGN {subtotal.toFixed(2)}</span>
+              <span className="text-neutral-600 dark:text-neutral-400">Subtotal</span>
+              <span className="font-medium">{formatPrice(subtotal, "GHS")}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Shipping</span>
-              <span className="font-medium">NGN {shippingCost.toFixed(2)}</span>
+              <span className="text-neutral-600 dark:text-neutral-400">Shipping</span>
+              <span className="font-medium">{formatPrice(SHIPPING_COST, "GHS")}</span>
             </div>
-            <div className="border-t pt-3 flex justify-between text-lg font-bold">
+            <div className="flex justify-between border-t border-neutral-200 pt-3 text-lg font-bold dark:border-neutral-700">
               <span>Total</span>
-              <span>NGN {total.toFixed(2)}</span>
+              <span>{formatPrice(total, "GHS")}</span>
             </div>
           </div>
 
           <a
             href="/checkout"
-            className="block w-full bg-black text-white text-center py-3 rounded hover:bg-gray-800 transition"
+            className="block w-full rounded-lg bg-black py-3 text-center font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
           >
             Proceed to Checkout
           </a>
 
           <a
             href="/products"
-            className="block w-full text-center py-3 mt-2 text-gray-600 hover:underline"
+            className="mt-3 block w-full py-2 text-center text-sm text-neutral-600 hover:underline dark:text-neutral-400"
           >
             Continue Shopping
           </a>

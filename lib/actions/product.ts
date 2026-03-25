@@ -12,7 +12,14 @@ export async function getProducts() {
   try {
     const products = await prisma.product.findMany({
       where: { isActive: true },
-      include: { category: true },
+      include: {
+        category: true,
+        badges: {
+          include: {
+            badge: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: products.map(convertProduct) };
@@ -162,7 +169,14 @@ export async function getProductBySlug(slug: string) {
   try {
     const product = await prisma.product.findUnique({
       where: { slug, isActive: true },
-      include: { category: true },
+      include: {
+        category: true,
+        badges: {
+          include: {
+            badge: true,
+          },
+        },
+      },
     });
 
     if (!product) {
@@ -184,7 +198,14 @@ export async function getProductsByCategory(
   try {
     const products = await prisma.product.findMany({
       where: { categoryId, isActive: true },
-      include: { category: true },
+      include: {
+        category: true,
+        badges: {
+          include: {
+            badge: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
       take: limit,
     });

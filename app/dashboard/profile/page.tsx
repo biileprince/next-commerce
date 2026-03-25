@@ -85,7 +85,7 @@ export default async function ProfilePage() {
               <div className="rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900">
                 <p className="text-sm text-neutral-500">Total Spent</p>
                 <p className="mt-1 text-2xl font-bold">
-                  {formatPrice(stats.totalSpent, "NGN")}
+                  {formatPrice(stats.totalSpent, "GHS")}
                 </p>
               </div>
               <div className="rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900">

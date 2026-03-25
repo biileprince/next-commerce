@@ -9,14 +9,19 @@ interface ProductBadgeProps {
   badge?: Badge;
 }
 
-export function ProductBadge({ type, value, className, badge }: ProductBadgeProps) {
+export function ProductBadge({
+  type,
+  value,
+  className,
+  badge,
+}: ProductBadgeProps) {
   // If a dynamic badge is passed, use it
   if (badge) {
     return (
       <div
         className={cn(
           "absolute left-2 top-2 z-10 rounded-md px-2 py-1 text-xs font-bold uppercase shadow-md",
-          className
+          className,
         )}
         style={{ backgroundColor: badge.color, color: badge.textColor }}
       >
@@ -54,7 +59,7 @@ export function ProductBadge({ type, value, className, badge }: ProductBadgeProp
       className={cn(
         "absolute left-2 top-2 z-10 rounded-md px-2 py-1 text-xs font-bold uppercase text-white shadow-md",
         badgeConfig.bg,
-        className
+        className,
       )}
     >
       {badgeConfig.text}

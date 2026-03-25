@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { GridTileImage } from "@/components/grid/tile";
 import { Product } from "@/types";
-import { ProductBadge, ProductBadges } from "@/components/product/product-badge";
+import {
+  ProductBadge,
+  ProductBadges,
+} from "@/components/product/product-badge";
 
 export function ProductGridItems({ products }: { products: Product[] }) {
   return (
@@ -13,7 +16,7 @@ export function ProductGridItems({ products }: { products: Product[] }) {
           ? Math.round(
               ((product.originalPrice! - product.price) /
                 product.originalPrice!) *
-                100
+                100,
             )
           : 0;
 
@@ -25,7 +28,12 @@ export function ProductGridItems({ products }: { products: Product[] }) {
 
           // Show database badges if available
           if (product.badges && product.badges.length > 0) {
-            return <ProductBadges badges={product.badges} stockQuantity={product.stockQuantity} />;
+            return (
+              <ProductBadges
+                badges={product.badges}
+                stockQuantity={product.stockQuantity}
+              />
+            );
           }
 
           // Fallback to computed badges

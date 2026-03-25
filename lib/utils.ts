@@ -12,7 +12,7 @@ export const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
 
 export const createUrl = (
   pathname: string,
-  params: URLSearchParams | ReadonlyURLSearchParams
+  params: URLSearchParams | ReadonlyURLSearchParams,
 ) => {
   const paramsString = params.toString();
   const queryString = `${paramsString.length ? "?" : ""}${paramsString}`;
@@ -22,11 +22,19 @@ export const createUrl = (
 
 export function formatPrice(
   price: number | string,
-  currency: string = "NGN"
+  currency: string = "GHS",
 ): string {
   const numericPrice = typeof price === "string" ? parseFloat(price) : price;
 
-  return new Intl.NumberFormat("en-NG", {
+  // Use custom formatting for GHS since Intl might not support it well
+  if (currency === "GHS") {
+    return `GH₵${numericPrice.toLocaleString("en-GH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency,
     currencyDisplay: "narrowSymbol",

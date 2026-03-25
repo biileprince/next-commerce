@@ -41,7 +41,7 @@ export function CartContent({ initialCart }: { initialCart: Cart }) {
     }
     if (type === "update" && quantity !== undefined) {
       return state.map((item) =>
-        item.id === id ? { ...item, quantity } : item
+        item.id === id ? { ...item, quantity } : item,
       );
     }
     return state;
@@ -88,7 +88,7 @@ export function CartContent({ initialCart }: { initialCart: Cart }) {
 
   const subtotal = optimisticCart.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
-    0
+    0,
   );
 
   const total = subtotal + SHIPPING_COST;
@@ -163,7 +163,10 @@ export function CartContent({ initialCart }: { initialCart: Cart }) {
 
                 {/* Item Total */}
                 <p className="text-lg font-semibold">
-                  {formatPrice(item.product.price * item.quantity, item.product.currency)}
+                  {formatPrice(
+                    item.product.price * item.quantity,
+                    item.product.currency,
+                  )}
                 </p>
 
                 {/* Remove Button */}
@@ -197,12 +200,20 @@ export function CartContent({ initialCart }: { initialCart: Cart }) {
 
           <div className="mb-4 space-y-3">
             <div className="flex justify-between">
-              <span className="text-neutral-600 dark:text-neutral-400">Subtotal</span>
-              <span className="font-medium">{formatPrice(subtotal, "GHS")}</span>
+              <span className="text-neutral-600 dark:text-neutral-400">
+                Subtotal
+              </span>
+              <span className="font-medium">
+                {formatPrice(subtotal, "GHS")}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-600 dark:text-neutral-400">Shipping</span>
-              <span className="font-medium">{formatPrice(SHIPPING_COST, "GHS")}</span>
+              <span className="text-neutral-600 dark:text-neutral-400">
+                Shipping
+              </span>
+              <span className="font-medium">
+                {formatPrice(SHIPPING_COST, "GHS")}
+              </span>
             </div>
             <div className="flex justify-between border-t border-neutral-200 pt-3 text-lg font-bold dark:border-neutral-700">
               <span>Total</span>

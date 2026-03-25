@@ -73,7 +73,7 @@ export function CartModal() {
         ) : (
           <div className="flex h-full flex-col justify-between overflow-hidden">
             {/* Cart Items */}
-            <ul className="flex-1 overflow-auto py-4 px-1">
+            <ul className="flex-1 overflow-auto px-4 py-4">
               {cart.items
                 .sort((a, b) => a.product.name.localeCompare(b.product.name))
                 .map((item) => {
@@ -82,12 +82,12 @@ export function CartModal() {
                   return (
                     <li
                       key={item.id}
-                      className="flex w-full flex-col border-b border-neutral-200 py-4 dark:border-neutral-700"
+                      className="flex w-full flex-col border-b border-neutral-200 py-4 first:pt-0 dark:border-neutral-700"
                     >
-                      {/* Mobile: Stack layout, Desktop: Row layout */}
-                      <div className="flex gap-3 sm:gap-4">
+                      {/* Product Row */}
+                      <div className="flex gap-4">
                         {/* Product Image */}
-                        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 sm:h-16 sm:w-16">
+                        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900">
                           {item.product.images?.[0] ? (
                             <Image
                               src={item.product.images[0]}
@@ -103,51 +103,57 @@ export function CartModal() {
                         </div>
 
                         {/* Product Info + Controls */}
-                        <div className="flex min-w-0 flex-1 flex-col gap-2">
+                        <div className="flex min-w-0 flex-1 flex-col justify-between">
                           {/* Product Name and Price */}
-                          <div className="flex-1">
+                          <div>
                             <Link
                               href={`/products/${item.product.slug}`}
                               onClick={closeCart}
-                              className="line-clamp-2 text-sm font-medium hover:underline"
+                              className="line-clamp-2 text-sm font-medium leading-tight hover:underline"
                             >
                               {item.product.name}
                             </Link>
-                            <p className="mt-0.5 text-sm text-neutral-500">
+                            <p className="mt-1 text-sm text-neutral-500">
                               {formatPrice(
                                 item.product.price,
-                                item.product.currency
+                                item.product.currency,
                               )}
                             </p>
                           </div>
 
-                          {/* Quantity Controls and Subtotal - Mobile: Below info */}
-                          <div className="flex items-center justify-between gap-2">
+                          {/* Quantity Controls and Subtotal */}
+                          <div className="mt-2 flex items-center justify-between">
                             {/* Quantity Controls */}
-                            <div className="flex h-8 flex-row items-center rounded-full border border-neutral-200 dark:border-neutral-700">
+                            <div className="flex h-8 items-center rounded-full border border-neutral-200 dark:border-neutral-700">
                               <button
                                 onClick={() =>
-                                  handleUpdateQuantity(item.id, item.quantity - 1)
+                                  handleUpdateQuantity(
+                                    item.id,
+                                    item.quantity - 1,
+                                  )
                                 }
                                 disabled={item.quantity <= 1 || isLoading}
-                                className="flex h-full min-w-[32px] items-center justify-center rounded-l-full px-2 transition-all hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
+                                className="flex h-full w-8 items-center justify-center rounded-l-full transition-colors hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
                               >
-                                <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <Minus className="h-3.5 w-3.5" />
                               </button>
-                              <p className="w-8 text-center text-sm">
+                              <span className="w-8 text-center text-sm font-medium">
                                 {isLoading ? <LoadingDots /> : item.quantity}
-                              </p>
+                              </span>
                               <button
                                 onClick={() =>
-                                  handleUpdateQuantity(item.id, item.quantity + 1)
+                                  handleUpdateQuantity(
+                                    item.id,
+                                    item.quantity + 1,
+                                  )
                                 }
                                 disabled={
                                   item.quantity >= item.product.stockQuantity ||
                                   isLoading
                                 }
-                                className="flex h-full min-w-[32px] items-center justify-center rounded-r-full px-2 transition-all hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
+                                className="flex h-full w-8 items-center justify-center rounded-r-full transition-colors hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-800"
                               >
-                                <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <Plus className="h-3.5 w-3.5" />
                               </button>
                             </div>
 
@@ -155,7 +161,7 @@ export function CartModal() {
                             <p className="text-sm font-semibold">
                               {formatPrice(
                                 item.product.price * item.quantity,
-                                item.product.currency
+                                item.product.currency,
                               )}
                             </p>
                           </div>
@@ -163,7 +169,7 @@ export function CartModal() {
                       </div>
 
                       {/* Remove Button */}
-                      <div className="mt-2 flex justify-start pl-[92px] sm:pl-[80px]">
+                      <div className="mt-2 pl-24">
                         <button
                           onClick={() => handleRemove(item.id)}
                           disabled={isLoading}
@@ -179,16 +185,16 @@ export function CartModal() {
             </ul>
 
             {/* Cart Summary */}
-            <div className="border-t border-neutral-200 px-1 pt-4 dark:border-neutral-700">
+            <div className="border-t border-neutral-200 px-4 py-4 dark:border-neutral-700">
               <div className="mb-2 flex items-center justify-between text-sm">
                 <p className="text-neutral-500">Subtotal</p>
-                <p>{formatPrice(totalAmount)}</p>
+                <p className="font-medium">{formatPrice(totalAmount)}</p>
               </div>
               <div className="mb-2 flex items-center justify-between text-sm">
                 <p className="text-neutral-500">Shipping</p>
-                <p>{formatPrice(SHIPPING_COST)}</p>
+                <p className="font-medium">{formatPrice(SHIPPING_COST)}</p>
               </div>
-              <div className="mb-3 flex items-center justify-between border-t pt-3 text-base font-bold dark:border-neutral-700">
+              <div className="mb-4 flex items-center justify-between border-t border-neutral-200 pt-3 text-base font-bold dark:border-neutral-700">
                 <p>Total</p>
                 <p>{formatPrice(grandTotal)}</p>
               </div>
@@ -201,7 +207,7 @@ export function CartModal() {
 
               <button
                 onClick={closeCart}
-                className="mt-2 w-full pb-2 text-center text-sm text-neutral-500 hover:text-black dark:hover:text-white"
+                className="mt-3 w-full text-center text-sm text-neutral-500 hover:text-black dark:hover:text-white"
               >
                 Continue Shopping
               </button>

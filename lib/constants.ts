@@ -30,8 +30,7 @@ export const FOOTER_LINKS = {
 
 export const SORT_OPTIONS = [
   { title: "Relevance", slug: null, path: "/products" },
-  { title: "Trending", slug: "trending", path: "/products?sort=trending" },
-  { title: "Latest arrivals", slug: "newest", path: "/products?sort=newest" },
+  { title: "Latest arrivals", slug: "latest", path: "/products?sort=latest" },
   {
     title: "Price: Low to high",
     slug: "price-asc",

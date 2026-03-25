@@ -9,10 +9,10 @@ async function getCollections() {
   });
 
   return [
-    { title: "All", path: "/search" },
+    { title: "All", path: "/products" },
     ...categories.map((cat) => ({
       title: cat.name,
-      path: `/search?category=${cat.slug}`,
+      path: `/products?category=${cat.slug}`,
     })),
   ];
 }

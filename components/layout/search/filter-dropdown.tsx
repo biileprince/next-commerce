@@ -25,19 +25,61 @@ export function FilterDropdown({
   const getCurrentFilter = () => {
     if (title === "Collections") {
       const category = searchParams.get("category");
+      if (!category) return "All";
       const item = list.find((item) =>
-        item.path.includes(`category=${category}`),
+        item.path.includes(`category=${category}`)
       );
       return item?.title || "All";
     } else if (title === "Sort by") {
       const sort = searchParams.get("sort");
-      const item = list.find((item) => {
-        if (item.slug === null && !sort) return true;
-        return item.path.includes(`sort=${sort}`);
-      });
+      if (!sort) return "Relevance";
+      const item = list.find((item) => item.slug === sort);
       return item?.title || "Relevance";
     }
     return "Select";
+  };
+
+  const buildHref = (item: ListItem) => {
+    const newParams = new URLSearchParams();
+
+    if (title === "Collections") {
+      // Extract category from item path
+      const itemUrl = new URL(item.path, "http://localhost");
+      const itemCategory = itemUrl.searchParams.get("category");
+
+      // Preserve sort param
+      const currentSort = searchParams.get("sort");
+      if (itemCategory) {
+        newParams.set("category", itemCategory);
+      }
+      if (currentSort) {
+        newParams.set("sort", currentSort);
+      }
+    } else if (title === "Sort by") {
+      // Preserve category param
+      const currentCategory = searchParams.get("category");
+      if (currentCategory) {
+        newParams.set("category", currentCategory);
+      }
+      if (item.slug) {
+        newParams.set("sort", item.slug);
+      }
+    }
+
+    return `${pathname}${newParams.toString() ? `?${newParams.toString()}` : ""}`;
+  };
+
+  const isItemActive = (item: ListItem) => {
+    if (title === "Collections") {
+      const itemUrl = new URL(item.path, "http://localhost");
+      const itemCategory = itemUrl.searchParams.get("category");
+      const currentCategory = searchParams.get("category");
+      return itemCategory === currentCategory || (item.path === "/products" && !currentCategory);
+    } else if (title === "Sort by") {
+      const currentSort = searchParams.get("sort");
+      return (item.slug === null && !currentSort) || currentSort === item.slug;
+    }
+    return false;
   };
 
   return (
@@ -64,18 +106,12 @@ export function FilterDropdown({
           />
           <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-80 overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-950">
             {list.map((item) => {
-              const isActive =
-                pathname === item.path ||
-                (title === "Collections" &&
-                  searchParams.get("category") === item.path.split("=")[1]) ||
-                (title === "Sort by" &&
-                  ((item.slug === null && !searchParams.get("sort")) ||
-                    searchParams.get("sort") === item.slug));
+              const isActive = isItemActive(item);
 
               return (
                 <Link
                   key={item.title}
-                  href={item.path}
+                  href={buildHref(item)}
                   onClick={() => setIsOpen(false)}
                   className={`block px-4 py-2.5 text-sm transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900 ${
                     isActive

@@ -5,6 +5,14 @@ import prisma from "@/lib/prisma";
 import { sendVerificationOTP } from "@/lib/email/resend";
 import { sendOTP } from "@/lib/sms/africastalking";
 
+const trustedOrigins = [
+  process.env.BETTER_AUTH_URL,
+  process.env.NEXT_PUBLIC_APP_URL,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+  "http://localhost:3000",
+  "http://localhost:3001",
+].filter((origin): origin is string => Boolean(origin));
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -64,7 +72,7 @@ export const auth = betterAuth({
       },
     },
   },
-  trustedOrigins: ["http://localhost:3000", "http://localhost:3001"],
+  trustedOrigins,
 });
 
 export type Session = typeof auth.$Infer.Session & {

@@ -18,7 +18,7 @@ export async function Carousel() {
         {carouselProducts.map((product, i) => (
           <li
             key={`${product.slug}${i}`}
-            className="relative aspect-square h-[30vh] max-h-[275px] w-2/3 max-w-[475px] flex-none md:w-1/3"
+            className="relative aspect-3/4 h-[42vh] max-h-136 w-1/2 max-w-72 flex-none md:w-1/5"
           >
             <Link
               href={`/products/${product.slug}`}
@@ -33,7 +33,8 @@ export async function Carousel() {
                 }}
                 src={product.images?.[0]}
                 fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+                imageFit="contain"
+                sizes="(min-width: 1024px) 20vw, (min-width: 768px) 28vw, 50vw"
               />
             </Link>
           </li>

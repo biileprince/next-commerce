@@ -1,14 +1,19 @@
 import { getCart } from "@/lib/actions/cart";
 import { CartContent } from "./cart-content";
-import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { GuestCartContent } from "./guest-cart-content";
 
 export default async function CartPage() {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {
-    redirect("/sign-in?redirect=/cart");
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="mb-6 text-3xl font-bold">Shopping Cart</h1>
+        <GuestCartContent />
+      </div>
+    );
   }
 
   const result = await getCart();

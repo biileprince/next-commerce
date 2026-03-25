@@ -19,8 +19,12 @@ export function AddToCart({ product }: { product: Product }) {
 
     setIsAdding(true);
     try {
-      await addItem(product.id, quantity);
-      toast.success(`Added ${quantity} ${product.name} to cart`);
+      const result = await addItem(product, quantity);
+      if (result.success) {
+        toast.success(`Added ${quantity} ${product.name} to cart`);
+      } else {
+        toast.error(result.error ?? "Failed to add to cart");
+      }
     } catch {
       toast.error("Failed to add to cart");
     } finally {

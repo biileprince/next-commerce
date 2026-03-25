@@ -20,6 +20,8 @@ interface GridTileImageProps {
   sizes?: string;
   priority?: boolean;
   className?: string;
+  imageFit?: "cover" | "contain" | "contain-tight";
+  imageContainerClass?: string;
 }
 
 export function GridTileImage({
@@ -32,7 +34,16 @@ export function GridTileImage({
   sizes,
   priority,
   className,
+  imageFit = "cover",
+  imageContainerClass,
 }: GridTileImageProps) {
+  const imageFitClass =
+    imageFit === "cover"
+      ? "object-cover"
+      : imageFit === "contain-tight"
+        ? "object-contain object-center p-0"
+        : "object-contain object-center p-2";
+
   return (
     <div
       className={cn(
@@ -44,7 +55,7 @@ export function GridTileImage({
         className
       )}
     >
-      <div className="relative aspect-square w-full">
+      <div className={cn("relative aspect-square w-full", imageContainerClass)}>
         {src ? (
           <Image
             src={src}
@@ -52,10 +63,14 @@ export function GridTileImage({
             fill={fill}
             sizes={sizes}
             priority={priority}
-            className={cn("relative h-full w-full object-contain p-4", {
-              "transition duration-300 ease-in-out group-hover:scale-105":
-                isInteractive,
-            })}
+            className={cn(
+              "relative h-full w-full",
+              imageFitClass,
+              {
+                "transition duration-300 ease-in-out group-hover:scale-105":
+                  isInteractive,
+              },
+            )}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-neutral-50 dark:bg-neutral-900">

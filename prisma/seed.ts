@@ -59,7 +59,7 @@ async function main() {
       await prisma.category.findMany({
         select: { id: true, slug: true },
       })
-    ).map((category) => [category.slug, category.id])
+    ).map((category) => [category.slug, category.id]),
   );
 
   const productsSeed = [
@@ -102,6 +102,7 @@ async function main() {
       categorySlug: "electronics",
       images: [
         "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     {
@@ -129,6 +130,7 @@ async function main() {
       categorySlug: "electronics",
       images: [
         "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1629429407756-01cd3d7cfb38?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     {
@@ -169,6 +171,7 @@ async function main() {
       categorySlug: "electronics",
       images: [
         "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     {
@@ -209,13 +212,13 @@ async function main() {
       categorySlug: "home",
       images: [
         "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     {
       name: "Modern Coffee Table",
       slug: "modern-coffee-table",
-      description:
-        "Minimalist coffee table built for modern living rooms.",
+      description: "Minimalist coffee table built for modern living rooms.",
       price: 790,
       currency: "GHS",
       stockQuantity: 18,
@@ -263,6 +266,7 @@ async function main() {
       categorySlug: "fashion",
       images: [
         "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     {
@@ -276,6 +280,7 @@ async function main() {
       categorySlug: "sports",
       images: [
         "https://images.unsplash.com/photo-1599447421416-3414500d18a5?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518611843775-014b5f29e4b2?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     {
@@ -289,6 +294,49 @@ async function main() {
       categorySlug: "sports",
       images: [
         "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1574680178050-55c6a6a96e0a?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Adjustable Dumbbell Pair",
+      slug: "adjustable-dumbbell-pair",
+      description:
+        "Compact adjustable dumbbells for full-body strength workouts at home.",
+      price: 620,
+      currency: "GHS",
+      stockQuantity: 24,
+      categorySlug: "sports",
+      images: [
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Camping Tent 4-Person",
+      slug: "camping-tent-4-person",
+      description:
+        "Weather-resistant 4-person tent with quick setup for outdoor adventures.",
+      price: 890,
+      currency: "GHS",
+      stockQuantity: 15,
+      categorySlug: "sports",
+      images: [
+        "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Mountain Bike Helmet",
+      slug: "mountain-bike-helmet",
+      description:
+        "Lightweight bike helmet with ventilation channels and secure fit dial.",
+      price: 215,
+      currency: "GHS",
+      stockQuantity: 52,
+      categorySlug: "sports",
+      images: [
+        "https://images.unsplash.com/photo-1576858574144-9ae1ebcf5ae5?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80",
       ],
     },
     {
@@ -305,6 +353,58 @@ async function main() {
       ],
     },
     {
+      name: "Vitamin C Glow Cleanser",
+      slug: "vitamin-c-glow-cleanser",
+      description:
+        "Brightening facial cleanser formulated with vitamin C for daily use.",
+      price: 112,
+      currency: "GHS",
+      stockQuantity: 76,
+      categorySlug: "beauty",
+      images: [
+        "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Nourish Hair Repair Mask",
+      slug: "nourish-hair-repair-mask",
+      description:
+        "Deep conditioning hair mask that restores shine and strengthens strands.",
+      price: 148,
+      currency: "GHS",
+      stockQuantity: 62,
+      categorySlug: "beauty",
+      images: [
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "SPF 50 Daily Sun Shield",
+      slug: "spf-50-daily-sun-shield",
+      description:
+        "Lightweight broad-spectrum sunscreen with sweat-resistant protection.",
+      price: 124,
+      currency: "GHS",
+      stockQuantity: 95,
+      categorySlug: "beauty",
+      images: [
+        "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Shea Body Butter Cream",
+      slug: "shea-body-butter-cream",
+      description:
+        "Rich body butter cream infused with shea to deeply moisturize dry skin.",
+      price: 96,
+      currency: "GHS",
+      stockQuantity: 88,
+      categorySlug: "beauty",
+      images: [
+        "https://images.unsplash.com/photo-1611080541599-8c6dbde6ed28?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
       name: "Kids Building Blocks Set",
       slug: "kids-building-blocks-set",
       description:
@@ -315,6 +415,49 @@ async function main() {
       categorySlug: "toys",
       images: [
         "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Remote Control Racing Car",
+      slug: "remote-control-racing-car",
+      description:
+        "High-speed remote control car with durable tires for indoor and outdoor play.",
+      price: 260,
+      currency: "GHS",
+      stockQuantity: 40,
+      categorySlug: "toys",
+      images: [
+        "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Family Strategy Board Game",
+      slug: "family-strategy-board-game",
+      description:
+        "Interactive strategy board game designed for family game nights.",
+      price: 145,
+      currency: "GHS",
+      stockQuantity: 58,
+      categorySlug: "toys",
+      images: [
+        "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1606509031842-6e6d9c30f0cc?auto=format&fit=crop&w=1200&q=80",
+      ],
+    },
+    {
+      name: "Kids Puzzle Adventure 500 Pieces",
+      slug: "kids-puzzle-adventure-500-pieces",
+      description:
+        "Colorful 500-piece puzzle set that builds problem-solving and focus.",
+      price: 89,
+      currency: "GHS",
+      stockQuantity: 74,
+      categorySlug: "toys",
+      images: [
+        "https://images.unsplash.com/photo-1587440871875-191322ee64b0?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1516534775068-ba3e7458af70?auto=format&fit=crop&w=1200&q=80",
       ],
     },
   ];
@@ -364,7 +507,9 @@ async function main() {
       },
     });
   }
-  console.log(`✅ Applied percentage-off pricing to ${percentageOffProducts.length} products`);
+  console.log(
+    `✅ Applied percentage-off pricing to ${percentageOffProducts.length} products`,
+  );
 
   // Seed product badges
   const badges = [
@@ -415,12 +560,16 @@ async function main() {
   const products = await prisma.product.findMany({
     select: { id: true, slug: true },
   });
-  const productIdBySlug = new Map(products.map((product) => [product.slug, product.id]));
+  const productIdBySlug = new Map(
+    products.map((product) => [product.slug, product.id]),
+  );
 
   const badgeRows = await prisma.productBadge.findMany({
     select: { id: true, name: true },
   });
-  const badgeIdByName = new Map(badgeRows.map((badge) => [badge.name, badge.id]));
+  const badgeIdByName = new Map(
+    badgeRows.map((badge) => [badge.name, badge.id]),
+  );
 
   const badgeAssignments: Array<{ productSlug: string; badgeName: string }> = [
     { productSlug: "wireless-bluetooth-headphones", badgeName: "bestseller" },
@@ -452,7 +601,9 @@ async function main() {
       },
     });
   }
-  console.log(`✅ Upserted ${badgeAssignments.length} product badge assignments`);
+  console.log(
+    `✅ Upserted ${badgeAssignments.length} product badge assignments`,
+  );
 
   // Seed coupons (including percentage-off coupons)
   const now = new Date();
@@ -564,12 +715,12 @@ async function main() {
       update: {
         password: hashedPassword,
         providerId: "credential",
-        accountId: user.id,
+        accountId: email,
       },
       create: {
         id: `${user.id}-credential`,
         userId: user.id,
-        accountId: user.id,
+        accountId: email,
         providerId: "credential",
         password: hashedPassword,
       },
@@ -621,7 +772,7 @@ async function main() {
   });
 
   console.log(
-    `✅ Upserted users: ${adminUser.email} (admin), ${customerUser.email} (customer)`
+    `✅ Upserted users: ${adminUser.email} (admin), ${customerUser.email} (customer)`,
   );
 
   console.log("🎉 Database seeding completed successfully!");

@@ -5,7 +5,11 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 export type ListItem = SortFilterItem | PathFilterItem;
-export type SortFilterItem = { title: string; slug: string | null };
+export type SortFilterItem = {
+  title: string;
+  slug: string | null;
+  path?: string;
+};
 export type PathFilterItem = { title: string; path: string };
 
 function PathFilterItem({ item }: { item: PathFilterItem }) {
@@ -90,10 +94,10 @@ function SortFilterItem({ item }: { item: SortFilterItem }) {
 }
 
 function FilterItem({ item }: { item: ListItem }) {
-  return "path" in item ? (
-    <PathFilterItem item={item} />
-  ) : (
+  return "slug" in item ? (
     <SortFilterItem item={item} />
+  ) : (
+    <PathFilterItem item={item} />
   );
 }
 

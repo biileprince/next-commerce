@@ -80,6 +80,7 @@ export async function createOrder(addressId: string) {
             create: cart.items.map((item) => ({
               productId: item.productId,
               productName: item.product.name,
+              productImage: item.product.images[0] ?? null,
               productPrice: item.product.price,
               quantity: item.quantity,
               subtotal: Number(item.product.price) * item.quantity,
@@ -308,6 +309,13 @@ export async function retryPayment(orderId: string) {
       return { success: false, error: "Cannot pay for cancelled order" };
     }
 
+    const newReference = `ref-retry-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { paystackReference: newReference },
+    });
+
     // Initialize Paystack payment
     try {
       const paymentData = await initializePayment({
@@ -315,9 +323,7 @@ export async function retryPayment(orderId: string) {
           session.user.email ||
           `${session.user.phoneNumber || "user"}@temp.com`,
         amount: Math.round(Number(order.totalAmount) * 100), // Convert to kobo
-        reference:
-          order.paystackReference ||
-          `ref-retry-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+        reference: newReference,
         callback_url: `${process.env.BETTER_AUTH_URL}/orders/${order.id}?payment=success`,
         metadata: {
           orderId: order.id,
@@ -376,7 +382,9 @@ export async function getAdminOrders({
       return { success: false, error: "Unauthorized" };
     }
 
-    const userWithRole = session.user as typeof session.user & { role?: string };
+    const userWithRole = session.user as typeof session.user & {
+      role?: string;
+    };
 
     if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -465,7 +473,9 @@ export async function getAdminOrder(id: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const userWithRole = session.user as typeof session.user & { role?: string };
+    const userWithRole = session.user as typeof session.user & {
+      role?: string;
+    };
 
     if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -519,7 +529,9 @@ export async function updateOrderStatus(id: string, status: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const userWithRole = session.user as typeof session.user & { role?: string };
+    const userWithRole = session.user as typeof session.user & {
+      role?: string;
+    };
 
     if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -571,7 +583,9 @@ export async function updatePaymentStatus(id: string, paymentStatus: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const userWithRole = session.user as typeof session.user & { role?: string };
+    const userWithRole = session.user as typeof session.user & {
+      role?: string;
+    };
 
     if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -605,7 +619,9 @@ export async function updateTrackingNumber(id: string, trackingNumber: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const userWithRole = session.user as typeof session.user & { role?: string };
+    const userWithRole = session.user as typeof session.user & {
+      role?: string;
+    };
 
     if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -636,7 +652,9 @@ export async function adminCancelOrder(id: string, reason?: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const userWithRole = session.user as typeof session.user & { role?: string };
+    const userWithRole = session.user as typeof session.user & {
+      role?: string;
+    };
 
     if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
@@ -703,7 +721,9 @@ export async function adminRefundOrder(id: string, reason?: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const userWithRole = session.user as typeof session.user & { role?: string };
+    const userWithRole = session.user as typeof session.user & {
+      role?: string;
+    };
 
     if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };

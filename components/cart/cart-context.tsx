@@ -60,19 +60,78 @@ export function CartProvider({ children, initialCart }: CartProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (initialCart) {
-      localStorage.removeItem(GUEST_CART_KEY);
-      return;
-    }
+    let cancelled = false;
 
-    const storedCart = localStorage.getItem(GUEST_CART_KEY);
-    if (!storedCart) return;
+    const syncCart = async () => {
+      if (!initialCart) {
+        const storedCart = localStorage.getItem(GUEST_CART_KEY);
+        if (!storedCart) {
+          setCart(null);
+          return;
+        }
 
-    try {
-      setCart(JSON.parse(storedCart) as Cart);
-    } catch {
-      localStorage.removeItem(GUEST_CART_KEY);
-    }
+        try {
+          const guestCart = JSON.parse(storedCart) as Cart;
+          if (!cancelled) {
+            setCart(guestCart);
+          }
+        } catch {
+          localStorage.removeItem(GUEST_CART_KEY);
+          if (!cancelled) {
+            setCart(null);
+          }
+        }
+        return;
+      }
+
+      const storedCart = localStorage.getItem(GUEST_CART_KEY);
+      if (!storedCart) {
+        if (!cancelled) {
+          setCart(initialCart);
+        }
+        return;
+      }
+
+      try {
+        const guestCart = JSON.parse(storedCart) as Cart;
+        const guestItems = guestCart?.items ?? [];
+
+        if (!guestItems.length) {
+          localStorage.removeItem(GUEST_CART_KEY);
+          if (!cancelled) {
+            setCart(initialCart);
+          }
+          return;
+        }
+
+        const { addToCart, getCart } = await import("@/lib/actions/cart");
+
+        for (const item of guestItems) {
+          await addToCart(item.productId, item.quantity);
+        }
+
+        const refreshedCart = await getCart();
+        if (!cancelled) {
+          if (refreshedCart.success && refreshedCart.data) {
+            setCart(refreshedCart.data);
+          } else {
+            setCart(initialCart);
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setCart(initialCart);
+        }
+      } finally {
+        localStorage.removeItem(GUEST_CART_KEY);
+      }
+    };
+
+    void syncCart();
+
+    return () => {
+      cancelled = true;
+    };
   }, [initialCart]);
 
   const openCart = useCallback(() => setIsOpen(true), []);

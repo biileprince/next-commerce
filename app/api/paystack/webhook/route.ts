@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       console.error("PAYSTACK_SECRET_KEY not configured");
       return NextResponse.json(
         { error: "Webhook configuration error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -43,22 +43,9 @@ export async function POST(req: Request) {
 
     // Handle charge.success event
     if (event.event === "charge.success") {
-      const { reference, status, amount, channel, customer, authorization } =
-        event.data;
+      const { reference, status, channel, authorization } = event.data;
 
       console.log(`Processing payment: ${reference}, status: ${status}`);
-
-      // Log payment in database
-      await prisma.payment.create({
-        data: {
-          paystackReference: reference,
-          amount: amount / 100, // Convert from kobo to NGN
-          currency: "NGN",
-          status,
-          channel,
-          metadata: event.data,
-        },
-      });
 
       // Update order
       const order = await prisma.order.findUnique({
@@ -89,18 +76,6 @@ export async function POST(req: Request) {
 
       console.log(`Payment failed: ${reference}`);
 
-      // Log failed payment
-      await prisma.payment.create({
-        data: {
-          paystackReference: reference,
-          amount: event.data.amount / 100,
-          currency: "NGN",
-          status: "failed",
-          channel: event.data.channel || "unknown",
-          metadata: event.data,
-        },
-      });
-
       // Update order
       const order = await prisma.order.findUnique({
         where: { paystackReference: reference },
@@ -123,7 +98,7 @@ export async function POST(req: Request) {
     console.error("Webhook processing error:", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

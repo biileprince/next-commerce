@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { initializePayment } from "@/lib/paystack/client";
@@ -138,7 +139,7 @@ export async function createOrder(addressId: string) {
           paymentUrl: paymentData.authorization_url,
         },
       };
-    } catch (paymentError: any) {
+    } catch (paymentError) {
       // If payment initialization fails, we still have the order created
       console.error("Payment initialization failed:", paymentError);
       revalidatePath("/cart");
@@ -333,7 +334,7 @@ export async function retryPayment(orderId: string) {
           paymentUrl: paymentData.authorization_url,
         },
       };
-    } catch (paymentError: any) {
+    } catch (paymentError) {
       console.error("Payment initialization failed:", paymentError);
       return {
         success: false,
@@ -379,12 +380,12 @@ export async function getAdminOrders({
     }
 
     // Build where clause
-    const where: any = {
+    const where: Prisma.OrderWhereInput = {
       AND: [
         // Search by order number
         search
           ? {
-              orderNumber: { contains: search, mode: "insensitive" },
+              orderNumber: { contains: search, mode: "insensitive" as const },
             }
           : {},
         // Filter by status
@@ -580,5 +581,162 @@ export async function updatePaymentStatus(id: string, paymentStatus: string) {
   } catch (error) {
     console.error("Error updating payment status:", error);
     return { success: false, error: "Failed to update payment status" };
+  }
+}
+
+// Admin: Update tracking number
+export async function updateTrackingNumber(id: string, trackingNumber: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    await prisma.order.update({
+      where: { id },
+      data: { trackingNumber: trackingNumber || null },
+    });
+
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${id}`);
+    revalidatePath("/dashboard/orders");
+    revalidatePath(`/dashboard/orders/${id}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating tracking number:", error);
+    return { success: false, error: "Failed to update tracking number" };
+  }
+}
+
+// Admin: Cancel order with stock restoration
+export async function adminCancelOrder(id: string, reason?: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: { items: true },
+    });
+
+    if (!order) {
+      return { success: false, error: "Order not found" };
+    }
+
+    if (order.orderStatus === "cancelled") {
+      return { success: false, error: "Order is already cancelled" };
+    }
+
+    if (order.orderStatus === "delivered") {
+      return { success: false, error: "Cannot cancel a delivered order" };
+    }
+
+    // Cancel order and restore stock in transaction
+    await prisma.$transaction(async (tx) => {
+      // Update order status
+      await tx.order.update({
+        where: { id },
+        data: {
+          orderStatus: "cancelled",
+        },
+      });
+
+      // Restore stock for each item
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stockQuantity: {
+              increment: item.quantity,
+            },
+          },
+        });
+      }
+    });
+
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${id}`);
+    revalidatePath("/dashboard/orders");
+    revalidatePath(`/dashboard/orders/${id}`);
+    revalidatePath("/products");
+    return { success: true };
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    return { success: false, error: "Failed to cancel order" };
+  }
+}
+
+// Admin: Process refund
+export async function adminRefundOrder(id: string, reason?: string) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userWithRole = session?.user as typeof session.user & {
+      role?: string;
+    };
+
+    if (!session?.user || userWithRole.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: { items: true },
+    });
+
+    if (!order) {
+      return { success: false, error: "Order not found" };
+    }
+
+    if (order.paymentStatus !== "paid") {
+      return { success: false, error: "Can only refund paid orders" };
+    }
+
+    if (order.paymentStatus === "refunded") {
+      return { success: false, error: "Order is already refunded" };
+    }
+
+    // Process refund and restore stock
+    await prisma.$transaction(async (tx) => {
+      // Update order status
+      await tx.order.update({
+        where: { id },
+        data: {
+          paymentStatus: "refunded",
+          orderStatus: "cancelled",
+        },
+      });
+
+      // Restore stock for each item
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stockQuantity: {
+              increment: item.quantity,
+            },
+          },
+        });
+      }
+    });
+
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${id}`);
+    revalidatePath("/dashboard/orders");
+    revalidatePath(`/dashboard/orders/${id}`);
+    revalidatePath("/products");
+    return { success: true };
+  } catch (error) {
+    console.error("Error refunding order:", error);
+    return { success: false, error: "Failed to refund order" };
   }
 }

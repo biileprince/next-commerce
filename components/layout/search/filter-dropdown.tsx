@@ -15,7 +15,7 @@ export function FilterDropdown({
   list,
   title,
 }: {
-  list: ListItem[];
+  list: readonly ListItem[];
   title: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +26,7 @@ export function FilterDropdown({
     if (title === "Collections") {
       const category = searchParams.get("category");
       const item = list.find((item) =>
-        item.path.includes(`category=${category}`)
+        item.path.includes(`category=${category}`),
       );
       return item?.title || "All";
     } else if (title === "Sort by") {

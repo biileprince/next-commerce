@@ -13,7 +13,7 @@ export interface InitializePaymentData {
   amount: number; // In kobo (multiply NGN by 100)
   reference: string;
   callback_url: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   channels?: string[]; // ["card", "bank", "ussd", "mobile_money"]
 }
 
@@ -48,7 +48,7 @@ export interface PaystackVerifyResponse {
  * Initialize a payment transaction with Paystack
  */
 export async function initializePayment(
-  data: InitializePaymentData
+  data: InitializePaymentData,
 ): Promise<PaystackInitializeResponse> {
   try {
     const response = await paystackClient.post("/transaction/initialize", data);
@@ -58,13 +58,17 @@ export async function initializePayment(
     }
 
     return response.data.data;
-  } catch (error: any) {
+  } catch (error) {
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
     console.error(
       "Paystack initialization error:",
-      error.response?.data || error.message
+      axiosError.response?.data || axiosError.message,
     );
     throw new Error(
-      error.response?.data?.message || "Failed to initialize payment"
+      axiosError.response?.data?.message || "Failed to initialize payment",
     );
   }
 }
@@ -73,11 +77,11 @@ export async function initializePayment(
  * Verify a payment transaction with Paystack
  */
 export async function verifyPayment(
-  reference: string
+  reference: string,
 ): Promise<PaystackVerifyResponse> {
   try {
     const response = await paystackClient.get(
-      `/transaction/verify/${reference}`
+      `/transaction/verify/${reference}`,
     );
 
     if (!response.data.status) {
@@ -85,13 +89,17 @@ export async function verifyPayment(
     }
 
     return response.data.data;
-  } catch (error: any) {
+  } catch (error) {
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
     console.error(
       "Paystack verification error:",
-      error.response?.data || error.message
+      axiosError.response?.data || axiosError.message,
     );
     throw new Error(
-      error.response?.data?.message || "Failed to verify payment"
+      axiosError.response?.data?.message || "Failed to verify payment",
     );
   }
 }

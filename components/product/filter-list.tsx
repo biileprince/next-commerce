@@ -44,7 +44,7 @@ function SortFilterItem({ item }: { item: SortFilterItem }) {
     new URLSearchParams({
       ...(q && { q }),
       ...(item.slug && item.slug.length && { sort: item.slug }),
-    })
+    }),
   );
   const DynamicTag = active ? "p" : Link;
 
@@ -76,7 +76,7 @@ function FilterItem({ item }: { item: ListItem }) {
   );
 }
 
-function FilterItemList({ list }: { list: ListItem[] }) {
+function FilterItemList({ list }: { list: readonly ListItem[] }) {
   return (
     <>
       {list.map((item: ListItem, i) => (
@@ -90,7 +90,7 @@ export function FilterList({
   list,
   title,
 }: {
-  list: ListItem[];
+  list: readonly ListItem[];
   title?: string;
 }) {
   return (

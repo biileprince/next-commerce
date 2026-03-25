@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/middleware/admin";
 import { getAdminUser } from "@/lib/actions/admin-users";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -140,10 +141,13 @@ export default async function AdminUserDetailPage({
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 text-2xl font-bold dark:bg-neutral-800">
                   {user.image ? (
-                    <img
+                    <Image
                       src={user.image}
                       alt={user.name}
+                      width={64}
+                      height={64}
                       className="h-16 w-16 rounded-full object-cover"
+                      unoptimized
                     />
                   ) : (
                     user.name?.[0]?.toUpperCase() || "U"
@@ -310,7 +314,7 @@ export default async function AdminUserDetailPage({
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right font-medium">
-                            {formatPrice(order.totalAmount, order.currency)}
+                            {formatPrice(Number(order.totalAmount), order.currency)}
                           </TableCell>
                         </TableRow>
                       );

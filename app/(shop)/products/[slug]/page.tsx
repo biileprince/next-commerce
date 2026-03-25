@@ -122,7 +122,7 @@ export default async function ProductDetailPage({
                         {Math.round(
                           ((product.originalPrice - product.price) /
                             product.originalPrice) *
-                            100
+                            100,
                         )}
                         %
                       </span>
@@ -156,7 +156,7 @@ export default async function ProductDetailPage({
       {/* Full Description Section */}
       <div className="mt-12">
         <ProductDescription
-          description={product.description}
+          description={product.description ?? undefined}
           specifications={{
             // Placeholder specifications - can be extended per category
             SKU: product.id.slice(0, 8).toUpperCase(),
@@ -181,7 +181,7 @@ export default async function ProductDetailPage({
         }
       >
         <RelatedProducts
-          categoryId={product.categoryId}
+          categoryId={product.categoryId ?? null}
           currentProductId={product.id}
         />
       </Suspense>

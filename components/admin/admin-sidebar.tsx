@@ -10,6 +10,7 @@ import {
   Settings,
   Store,
   LogOut,
+  FolderTree,
 } from "lucide-react";
 
 import {
@@ -42,6 +43,11 @@ const navigationItems = [
     title: "Products",
     href: "/admin/products",
     icon: Package,
+  },
+  {
+    title: "Categories",
+    href: "/admin/categories",
+    icon: FolderTree,
   },
   {
     title: "Orders",

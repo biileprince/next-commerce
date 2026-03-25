@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/middleware/admin";
 import { getAdminProducts } from "@/lib/actions/product";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 import { Plus, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,9 +44,17 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
   const page = parseInt(params.page || "1");
   const search = params.search || "";
   const categoryId = params.categoryId || "";
-  const stockStatus = (params.stockStatus as any) || "all";
-  const sortBy = (params.sortBy as any) || "createdAt";
-  const sortOrder = (params.sortOrder as any) || "desc";
+  const stockStatus = (params.stockStatus || "all") as
+    | "all"
+    | "in_stock"
+    | "low_stock"
+    | "out_of_stock";
+  const sortBy = (params.sortBy || "createdAt") as
+    | "createdAt"
+    | "name"
+    | "price"
+    | "stockQuantity";
+  const sortOrder = (params.sortOrder || "desc") as "asc" | "desc";
 
   // Fetch categories for filter
   const categories = await prisma.category.findMany({
@@ -177,9 +186,11 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         {product.images[0] ? (
-                          <img
+                          <Image
                             src={product.images[0]}
                             alt={product.name}
+                            width={40}
+                            height={40}
                             className="size-10 rounded object-cover"
                           />
                         ) : (

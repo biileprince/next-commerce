@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/middleware/admin";
 import { getAdminUsers, getUsersStats } from "@/lib/actions/admin-users";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -165,10 +166,13 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-sm font-medium dark:bg-neutral-800">
                             {user.image ? (
-                              <img
+                              <Image
                                 src={user.image}
                                 alt={user.name}
+                                width={40}
+                                height={40}
                                 className="h-10 w-10 rounded-full object-cover"
+                                unoptimized
                               />
                             ) : (
                               user.name?.[0]?.toUpperCase() ||

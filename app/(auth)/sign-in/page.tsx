@@ -23,12 +23,7 @@ export default function SignInPage() {
   // Check if already logged in and redirect based on role
   useEffect(() => {
     if (session && !isPending) {
-      const user = session.user as typeof session.user & { role?: string };
-      if (user.role === "admin") {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/products");
-      }
+      router.push("/products");
     }
   }, [session, isPending, router]);
 
@@ -76,10 +71,7 @@ export default function SignInPage() {
             // Fetch fresh session to get role
             const { data } = await authClient.getSession();
             if (data?.user) {
-              const user = data.user as typeof data.user & { role?: string };
-              const redirectPath =
-                user.role === "admin" ? "/admin/dashboard" : "/products";
-              setTimeout(() => router.push(redirectPath), 200);
+              setTimeout(() => router.push("/products"), 200);
             } else {
               setTimeout(() => router.push("/products"), 200);
             }
@@ -127,10 +119,7 @@ export default function SignInPage() {
             // Fetch fresh session to get role
             const { data } = await authClient.getSession();
             if (data?.user) {
-              const user = data.user as typeof data.user & { role?: string };
-              const redirectPath =
-                user.role === "admin" ? "/admin/dashboard" : "/products";
-              setTimeout(() => router.push(redirectPath), 200);
+              setTimeout(() => router.push("/products"), 200);
             } else {
               setTimeout(() => router.push("/products"), 200);
             }

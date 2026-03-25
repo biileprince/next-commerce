@@ -38,7 +38,7 @@ export async function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-neutral-800 dark:bg-neutral-950/95 dark:supports-[backdrop-filter]:bg-neutral-950/80">
+    <nav className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/80 dark:border-neutral-800 dark:bg-neutral-950/95 dark:supports-backdrop-filter:bg-neutral-950/80">
       <div className="mx-auto max-w-screen-2xl">
         <div className="relative flex items-center justify-between gap-2 px-4 py-3 lg:gap-4 lg:px-6">
           {/* Left Side - Hamburger (Mobile) + Logo + Menu (Desktop) */}
@@ -46,7 +46,11 @@ export async function Navbar() {
             {/* Mobile Hamburger - Always visible on mobile */}
             <div className="block flex-none md:hidden">
               <Suspense fallback={null}>
-                <MobileMenu menu={menu} categories={categories} />
+                <MobileMenu
+                  menu={menu}
+                  categories={categories}
+                  isAuthenticated={Boolean(session?.user)}
+                />
               </Suspense>
             </div>
 
@@ -54,7 +58,7 @@ export async function Navbar() {
             <Link
               href="/"
               prefetch={true}
-              className="flex items-center flex-shrink-0"
+              className="flex shrink-0 items-center"
             >
               <LogoSquare />
               <div className="ml-2 hidden text-sm font-semibold uppercase tracking-wider sm:block lg:block">
@@ -95,7 +99,7 @@ export async function Navbar() {
             ) : (
               <Link
                 href="/sign-in"
-                className="hidden h-9 items-center justify-center rounded-lg border border-neutral-200 bg-white px-4 text-sm font-medium transition-colors hover:bg-neutral-50 sm:flex dark:border-neutral-800 dark:bg-black dark:hover:bg-neutral-900"
+                className="flex h-9 items-center justify-center rounded-lg border border-neutral-200 bg-white px-3 text-sm font-medium transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:bg-black dark:hover:bg-neutral-900 sm:px-4"
               >
                 Sign In
               </Link>

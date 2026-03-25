@@ -26,9 +26,11 @@ interface Category {
 export function MobileMenu({
   menu,
   categories,
+  isAuthenticated = false,
 }: {
   menu: MenuItem[];
   categories?: Category[];
+  isAuthenticated?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
@@ -56,7 +58,7 @@ export function MobileMenu({
 
       <SheetContent
         side="left"
-        className="flex h-full w-[280px] flex-col bg-white/95 backdrop-blur-xl dark:bg-black/95 sm:w-[320px]"
+        className="flex h-full w-70 flex-col bg-white/95 backdrop-blur-xl dark:bg-black/95 sm:w-[320px]"
       >
         <SheetHeader>
           <SheetTitle className="text-lg font-semibold">Menu</SheetTitle>
@@ -112,6 +114,19 @@ export function MobileMenu({
                   </Link>
                 </li>
               ))}
+
+            {!isAuthenticated && (
+              <li>
+                <Link
+                  href="/sign-in"
+                  prefetch={true}
+                  onClick={closeMenu}
+                  className="block border-b border-neutral-200 px-4 py-4 text-base font-medium text-black transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:text-white dark:hover:bg-neutral-900"
+                >
+                  Sign In
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </SheetContent>

@@ -11,6 +11,9 @@ import {
   Store,
   LogOut,
   FolderTree,
+  Tag,
+  Ticket,
+  BarChart3,
 } from "lucide-react";
 
 import {
@@ -50,14 +53,29 @@ const navigationItems = [
     icon: FolderTree,
   },
   {
+    title: "Badges",
+    href: "/admin/badges",
+    icon: Tag,
+  },
+  {
     title: "Orders",
     href: "/admin/orders",
     icon: ShoppingCart,
   },
   {
+    title: "Coupons",
+    href: "/admin/coupons",
+    icon: Ticket,
+  },
+  {
     title: "Users",
     href: "/admin/users",
     icon: Users,
+  },
+  {
+    title: "Analytics",
+    href: "/admin/analytics",
+    icon: BarChart3,
   },
 ];
 

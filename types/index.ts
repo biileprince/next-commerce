@@ -92,7 +92,9 @@ export type OrderItem = {
 
 // Helper function to convert Prisma models to client types
 export function convertProduct(
-  product: Prisma.ProductGetPayload<{ include?: { category: true } }>
+  product: Prisma.ProductGetPayload<object> & {
+    category?: { id: string; name: string; slug: string } | null;
+  },
 ): Product {
   return {
     ...product,
@@ -114,7 +116,7 @@ export function convertProduct(
 }
 
 export function convertCartItem(
-  item: Prisma.CartItemGetPayload<{ include: { product: true } }>
+  item: Prisma.CartItemGetPayload<{ include: { product: true } }>,
 ): CartItem {
   return {
     ...item,
@@ -125,7 +127,7 @@ export function convertCartItem(
 export function convertCart(
   cart: Prisma.CartGetPayload<{
     include: { items: { include: { product: true } } };
-  }>
+  }>,
 ): Cart {
   return {
     ...cart,

@@ -25,20 +25,24 @@ export default async function EditProductPage({ params }: PageProps) {
 
   const { id } = await params;
 
-  // Fetch product
-  const result = await getAdminProduct(id);
+  // Fetch product, categories, and badges in parallel
+  const [result, categories, badges] = await Promise.all([
+    getAdminProduct(id),
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.productBadge.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
   if (!result.success || !result.data) {
     notFound();
   }
 
   const product = result.data;
-
-  // Fetch categories for the form
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-  });
 
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6">
@@ -66,7 +70,11 @@ export default async function EditProductPage({ params }: PageProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProductForm categories={categories} product={product} />
+          <ProductForm
+            categories={categories}
+            badges={badges}
+            product={product}
+          />
         </CardContent>
       </Card>
     </div>

@@ -75,7 +75,7 @@ export default async function OrdersPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-semibold">
-                    {formatPrice(order.totalAmount, order.currency)}
+                    {formatPrice(Number(order.totalAmount), order.currency)}
                   </p>
                   <span
                     className={`mt-1 inline-block rounded px-2 py-1 text-xs font-medium ${

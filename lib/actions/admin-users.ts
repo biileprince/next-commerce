@@ -8,15 +8,18 @@ import { revalidatePath } from "next/cache";
 // Helper to check admin access
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const userWithRole = session?.user as
-    | (typeof session.user & { role?: string })
-    | undefined;
 
-  if (!session?.user || userWithRole?.role !== "admin") {
-    return { authorized: false, error: "Unauthorized" };
+  if (!session?.user) {
+    return { authorized: false as const, error: "Unauthorized" };
   }
 
-  return { authorized: true, userId: session.user.id };
+  const userWithRole = session.user as typeof session.user & { role?: string };
+
+  if (userWithRole.role !== "admin") {
+    return { authorized: false as const, error: "Unauthorized" };
+  }
+
+  return { authorized: true as const, userId: session.user.id };
 }
 
 // Get all users with pagination and search
@@ -66,6 +69,9 @@ export async function getAdminUsers({
           emailVerified: true,
           phoneNumberVerified: true,
           role: true,
+          status: true,
+          suspendedAt: true,
+          suspendedReason: true,
           image: true,
           createdAt: true,
           _count: {
@@ -113,6 +119,9 @@ export async function getAdminUser(id: string) {
         emailVerified: true,
         phoneNumberVerified: true,
         role: true,
+        status: true,
+        suspendedAt: true,
+        suspendedReason: true,
         image: true,
         createdAt: true,
         updatedAt: true,
@@ -121,7 +130,6 @@ export async function getAdminUser(id: string) {
         },
         orders: {
           orderBy: { createdAt: "desc" },
-          take: 10,
           include: {
             items: true,
           },
@@ -197,6 +205,49 @@ export async function updateUserRole(
   } catch (error) {
     console.error("Error updating user role:", error);
     return { success: false, error: "Failed to update user role" };
+  }
+}
+
+// Update user status
+export async function updateUserStatus(
+  userId: string,
+  status: "active" | "suspended" | "banned",
+  reason?: string,
+) {
+  try {
+    const authCheck = await requireAdmin();
+    if (!authCheck.authorized) {
+      return { success: false, error: authCheck.error };
+    }
+
+    // Prevent changing own status
+    if (userId === authCheck.userId) {
+      return { success: false, error: "Cannot change your own status" };
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        status,
+        suspendedAt: status === "active" ? null : new Date(),
+        suspendedReason: status === "active" ? null : reason || null,
+      },
+    });
+
+    revalidatePath("/admin/users");
+    revalidatePath(`/admin/users/${userId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    return { success: false, error: "Failed to update user status" };
   }
 }
 

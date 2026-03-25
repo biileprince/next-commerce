@@ -42,11 +42,16 @@ export async function getAdminProducts({
 }) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
+
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & {
       role?: string;
     };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -107,24 +112,45 @@ export async function getAdminProducts({
 export async function getAdminProduct(id: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
+
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & {
       role?: string;
     };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { category: true },
+      include: {
+        category: true,
+        badges: {
+          include: {
+            badge: true,
+          },
+        },
+      },
     });
 
     if (!product) {
       return { success: false, error: "Product not found" };
     }
 
-    return { success: true, data: convertProduct(product) };
+    // Extract badge IDs for the form
+    const badgeIds = product.badges.map((b) => b.badgeId);
+
+    return {
+      success: true,
+      data: {
+        ...convertProduct(product),
+        badgeIds,
+      },
+    };
   } catch (error) {
     console.error("Error fetching product:", error);
     return { success: false, error: "Failed to fetch product" };
@@ -153,7 +179,7 @@ export async function getProductBySlug(slug: string) {
 // Get products by category
 export async function getProductsByCategory(
   categoryId: string,
-  limit?: number
+  limit?: number,
 ) {
   try {
     const products = await prisma.product.findMany({
@@ -173,11 +199,16 @@ export async function getProductsByCategory(
 export async function createProduct(formData: FormData) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
+
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & {
       role?: string;
     };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -228,11 +259,16 @@ export async function createProduct(formData: FormData) {
 export async function updateProduct(id: string, formData: FormData) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
+
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & {
       role?: string;
     };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -284,11 +320,16 @@ export async function updateProduct(id: string, formData: FormData) {
 export async function deleteProduct(id: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
+
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & {
       role?: string;
     };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -310,11 +351,16 @@ export async function deleteProduct(id: string) {
 export async function toggleProductStatus(id: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
+
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & {
       role?: string;
     };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 

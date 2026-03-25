@@ -294,12 +294,12 @@ export default async function OrderDetailPage({
                     <div className="min-w-0 flex-1">
                       <p className="font-medium">{item.productName}</p>
                       <p className="mt-0.5 text-sm text-neutral-500">
-                        {formatPrice(item.productPrice, order.currency)} x{" "}
+                        {formatPrice(Number(item.productPrice), order.currency)} x{" "}
                         {item.quantity}
                       </p>
                     </div>
                     <p className="font-semibold">
-                      {formatPrice(item.subtotal, order.currency)}
+                      {formatPrice(Number(item.subtotal), order.currency)}
                     </p>
                   </div>
                 ))}
@@ -318,24 +318,24 @@ export default async function OrderDetailPage({
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-neutral-500">Subtotal</span>
-                <span>{formatPrice(order.subtotal, order.currency)}</span>
+                <span>{formatPrice(Number(order.subtotal), order.currency)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-neutral-500">Shipping</span>
-                <span>{formatPrice(order.shippingCost, order.currency)}</span>
+                <span>{formatPrice(Number(order.shippingCost), order.currency)}</span>
               </div>
-              {order.discount && (
+              {order.discountAmount && Number(order.discountAmount) > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-neutral-500">Discount</span>
                   <span className="text-green-600">
-                    -{formatPrice(order.discount, order.currency)}
+                    -{formatPrice(Number(order.discountAmount), order.currency)}
                   </span>
                 </div>
               )}
               <div className="border-t border-neutral-200 pt-3 dark:border-neutral-800">
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>{formatPrice(order.totalAmount, order.currency)}</span>
+                  <span>{formatPrice(Number(order.totalAmount), order.currency)}</span>
                 </div>
               </div>
             </CardContent>
@@ -361,11 +361,6 @@ export default async function OrderDetailPage({
                   <p className="text-neutral-500">
                     {order.address.city}, {order.address.region}
                   </p>
-                  {order.address.postalCode && (
-                    <p className="text-neutral-500">
-                      {order.address.postalCode}
-                    </p>
-                  )}
                   <p className="mt-2 text-neutral-500">
                     {order.address.phoneNumber}
                   </p>

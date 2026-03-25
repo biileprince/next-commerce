@@ -26,7 +26,7 @@ export async function Navbar() {
   }
 
   // Fetch categories for mobile menu
-  let categories = [];
+  let categories: { id: string; name: string; slug: string }[] = [];
   try {
     categories = await prisma.category.findMany({
       where: { isActive: true },

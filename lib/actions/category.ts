@@ -8,13 +8,18 @@ import { revalidatePath } from "next/cache";
 // Helper to check admin access
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const userWithRole = session?.user as (typeof session.user & { role?: string }) | undefined;
 
-  if (!session?.user || userWithRole?.role !== "admin") {
-    return { authorized: false, error: "Unauthorized" };
+  if (!session?.user) {
+    return { authorized: false as const, error: "Unauthorized" };
   }
 
-  return { authorized: true, userId: session.user.id };
+  const userWithRole = session.user as typeof session.user & { role?: string };
+
+  if (userWithRole.role !== "admin") {
+    return { authorized: false as const, error: "Unauthorized" };
+  }
+
+  return { authorized: true as const, userId: session.user.id };
 }
 
 // Get all categories with pagination and search
@@ -244,7 +249,7 @@ export async function deleteCategory(id: string) {
     if (category._count.products > 0) {
       return {
         success: false,
-        error: `Cannot delete category with ${category._count.products} product(s). Remove or reassign products first.`,
+        error: "Cannot delete category with attached products. Please remove or reassign the products first.",
       };
     }
 

@@ -15,11 +15,17 @@ import { ProductForm } from "@/components/admin/product-form";
 export default async function NewProductPage() {
   await requireAdmin();
 
-  // Fetch categories for the form
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-  });
+  // Fetch categories and badges for the form
+  const [categories, badges] = await Promise.all([
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.productBadge.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
   return (
     <div className="w-full max-w-full overflow-x-hidden space-y-6">
@@ -47,7 +53,7 @@ export default async function NewProductPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProductForm categories={categories} />
+          <ProductForm categories={categories} badges={badges} />
         </CardContent>
       </Card>
     </div>

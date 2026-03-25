@@ -55,8 +55,7 @@ export function OrderStatusUpdate({ order }: OrderStatusUpdateProps) {
 
   const canCancel =
     order.orderStatus !== "cancelled" && order.orderStatus !== "delivered";
-  const canRefund =
-    order.paymentStatus === "paid" && order.paymentStatus !== "refunded";
+  const canRefund = order.paymentStatus === "paid";
 
   const handleOrderStatusUpdate = async () => {
     if (orderStatus === order.orderStatus) return;

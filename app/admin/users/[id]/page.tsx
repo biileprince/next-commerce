@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -23,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserRoleToggle } from "@/components/admin/user-role-toggle";
+import { UserStatusToggle } from "@/components/admin/user-status-toggle";
 
 interface UserDetailPageProps {
   params: Promise<{ id: string }>;
@@ -80,11 +80,18 @@ export default async function AdminUserDetailPage({
             {user.email}
           </p>
         </div>
-        <UserRoleToggle
-          userId={user.id}
-          userName={user.name}
-          currentRole={user.role}
-        />
+        <div className="flex flex-wrap gap-2">
+          <UserStatusToggle
+            userId={user.id}
+            userName={user.name}
+            currentStatus={user.status}
+          />
+          <UserRoleToggle
+            userId={user.id}
+            userName={user.name}
+            currentRole={user.role}
+          />
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -103,7 +110,7 @@ export default async function AdminUserDetailPage({
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              {formatPrice(user.stats?.totalSpent || 0, "NGN")}
+              {formatPrice(user.stats?.totalSpent || 0, "GHS")}
             </p>
           </CardContent>
         </Card>
@@ -159,6 +166,18 @@ export default async function AdminUserDetailPage({
                     variant={user.role === "admin" ? "default" : "outline"}
                   >
                     {user.role === "admin" ? "Admin" : "Customer"}
+                  </Badge>
+                  <Badge
+                    variant={
+                      user.status === "active"
+                        ? "success"
+                        : user.status === "suspended"
+                          ? "warning"
+                          : "destructive"
+                    }
+                    className="ml-2"
+                  >
+                    {user.status}
                   </Badge>
                 </div>
               </div>
@@ -257,9 +276,9 @@ export default async function AdminUserDetailPage({
         {/* Orders */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
+            <CardTitle>Order History</CardTitle>
             <CardDescription>
-              Last 10 orders placed by this user
+              Full order history for this user
             </CardDescription>
           </CardHeader>
           <CardContent>

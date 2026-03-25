@@ -34,8 +34,14 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
   const result = await getOrders();
   const allOrders = result.success ? result.data || [] : [];
 
+  // Convert Decimal fields to numbers for OrdersList component
+  const ordersWithNumbers = allOrders.map((order) => ({
+    ...order,
+    totalAmount: Number(order.totalAmount),
+  }));
+
   // Filter orders based on search params
-  let filteredOrders = allOrders;
+  let filteredOrders = ordersWithNumbers;
 
   if (params.status && params.status !== "all") {
     filteredOrders = filteredOrders.filter(
@@ -56,16 +62,16 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
 
   // Calculate status counts
   const statusCounts = {
-    all: allOrders.length,
-    pending: allOrders.filter(
+    all: ordersWithNumbers.length,
+    pending: ordersWithNumbers.filter(
       (o) =>
         o.orderStatus === "pending" ||
         o.orderStatus === "confirmed" ||
         o.orderStatus === "processing",
     ).length,
-    shipped: allOrders.filter((o) => o.orderStatus === "shipped").length,
-    delivered: allOrders.filter((o) => o.orderStatus === "delivered").length,
-    cancelled: allOrders.filter((o) => o.orderStatus === "cancelled").length,
+    shipped: ordersWithNumbers.filter((o) => o.orderStatus === "shipped").length,
+    delivered: ordersWithNumbers.filter((o) => o.orderStatus === "delivered").length,
+    cancelled: ordersWithNumbers.filter((o) => o.orderStatus === "cancelled").length,
   };
 
   return (

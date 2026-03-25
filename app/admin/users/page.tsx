@@ -153,6 +153,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                     </TableHead>
                     <TableHead className="text-center">Orders</TableHead>
                     <TableHead className="text-center">Role</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
                     <TableHead className="hidden sm:table-cell">
                       Joined
                     </TableHead>
@@ -225,6 +226,15 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                           <Badge variant="outline">Customer</Badge>
                         )}
                       </TableCell>
+                      <TableCell className="text-center">
+                        {user.status === "active" ? (
+                          <Badge variant="success">Active</Badge>
+                        ) : user.status === "suspended" ? (
+                          <Badge variant="warning">Suspended</Badge>
+                        ) : (
+                          <Badge variant="destructive">Banned</Badge>
+                        )}
+                      </TableCell>
                       <TableCell className="hidden text-sm text-neutral-500 sm:table-cell">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </TableCell>
@@ -233,6 +243,9 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                           userId={user.id}
                           userName={user.name}
                           currentRole={user.role}
+                          currentStatus={
+                            (user.status as "active" | "suspended" | "banned")
+                          }
                         />
                       </TableCell>
                     </TableRow>

@@ -371,11 +371,14 @@ export async function getAdminOrders({
 }) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
-      role?: string;
-    };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & { role?: string };
+
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -457,11 +460,14 @@ export async function getAdminOrders({
 export async function getAdminOrder(id: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
-      role?: string;
-    };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & { role?: string };
+
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -508,11 +514,14 @@ export async function getAdminOrder(id: string) {
 export async function updateOrderStatus(id: string, status: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
-      role?: string;
-    };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & { role?: string };
+
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -557,11 +566,14 @@ export async function updateOrderStatus(id: string, status: string) {
 export async function updatePaymentStatus(id: string, paymentStatus: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
-      role?: string;
-    };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & { role?: string };
+
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -588,11 +600,14 @@ export async function updatePaymentStatus(id: string, paymentStatus: string) {
 export async function updateTrackingNumber(id: string, trackingNumber: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
-      role?: string;
-    };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & { role?: string };
+
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -616,11 +631,14 @@ export async function updateTrackingNumber(id: string, trackingNumber: string) {
 export async function adminCancelOrder(id: string, reason?: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
-      role?: string;
-    };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & { role?: string };
+
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -680,11 +698,14 @@ export async function adminCancelOrder(id: string, reason?: string) {
 export async function adminRefundOrder(id: string, reason?: string) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    const userWithRole = session?.user as typeof session.user & {
-      role?: string;
-    };
 
-    if (!session?.user || userWithRole.role !== "admin") {
+    if (!session?.user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const userWithRole = session.user as typeof session.user & { role?: string };
+
+    if (userWithRole.role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -697,12 +718,12 @@ export async function adminRefundOrder(id: string, reason?: string) {
       return { success: false, error: "Order not found" };
     }
 
-    if (order.paymentStatus !== "paid") {
-      return { success: false, error: "Can only refund paid orders" };
-    }
-
     if (order.paymentStatus === "refunded") {
       return { success: false, error: "Order is already refunded" };
+    }
+
+    if (order.paymentStatus !== "paid") {
+      return { success: false, error: "Can only refund paid orders" };
     }
 
     // Process refund and restore stock

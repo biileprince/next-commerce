@@ -251,7 +251,7 @@ export default async function DashboardPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-semibold">
-                            {formatPrice(order.totalAmount, order.currency)}
+                            {formatPrice(Number(order.totalAmount), order.currency)}
                           </p>
                           <p className="mt-1 text-xs text-neutral-500">
                             {order.paymentStatus === "paid"

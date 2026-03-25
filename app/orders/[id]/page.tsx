@@ -100,12 +100,13 @@ export default async function OrderDetailPage({
                       Quantity: {item.quantity}
                     </p>
                     <p className="text-sm text-neutral-500">
-                      {formatPrice(item.productPrice, order.currency)} each
+                      {formatPrice(Number(item.productPrice), order.currency)}{" "}
+                      each
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold">
-                      {formatPrice(item.subtotal, order.currency)}
+                      {formatPrice(Number(item.subtotal), order.currency)}
                     </p>
                   </div>
                 </div>
@@ -156,17 +157,23 @@ export default async function OrderDetailPage({
                 <span className="text-neutral-600 dark:text-neutral-400">
                   Subtotal
                 </span>
-                <span>{formatPrice(order.subtotal, order.currency)}</span>
+                <span>
+                  {formatPrice(Number(order.subtotal), order.currency)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-neutral-600 dark:text-neutral-400">
                   Shipping
                 </span>
-                <span>{formatPrice(order.shippingCost, order.currency)}</span>
+                <span>
+                  {formatPrice(Number(order.shippingCost), order.currency)}
+                </span>
               </div>
               <div className="flex justify-between border-t border-neutral-200 pt-2 text-base font-semibold dark:border-neutral-800">
                 <span>Total</span>
-                <span>{formatPrice(order.totalAmount, order.currency)}</span>
+                <span>
+                  {formatPrice(Number(order.totalAmount), order.currency)}
+                </span>
               </div>
             </div>
 

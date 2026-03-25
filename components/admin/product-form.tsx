@@ -8,10 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createProduct, updateProduct } from "@/lib/actions/product";
+import { assignBadgesToProduct } from "@/lib/actions/badges";
 import { toast } from "sonner";
 
 interface ProductFormProps {
   categories: { id: string; name: string }[];
+  badges: {
+    id: string;
+    name: string;
+    label: string;
+    color: string;
+    textColor: string;
+  }[];
   product?: {
     id: string;
     name: string;
@@ -21,15 +29,19 @@ interface ProductFormProps {
     stockQuantity: number;
     categoryId?: string | null;
     images: string[];
+    badgeIds?: string[];
   };
 }
 
-export function ProductForm({ categories, product }: ProductFormProps) {
+export function ProductForm({ categories, badges, product }: ProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState<string[]>(product?.images || []);
   const [imageInput, setImageInput] = useState("");
+  const [selectedBadgeIds, setSelectedBadgeIds] = useState<string[]>(
+    product?.badgeIds || [],
+  );
 
   const isEdit = !!product;
 
@@ -126,6 +138,19 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       ? await updateProduct(product.id, formData)
       : await createProduct(formData);
 
+    if (result.success && result.data) {
+      // Assign badges to the product
+      const productId = result.data.id;
+      const badgeResult = await assignBadgesToProduct(
+        productId,
+        selectedBadgeIds,
+      );
+
+      if (!badgeResult.success) {
+        toast.error("Product saved but failed to assign badges");
+      }
+    }
+
     setLoading(false);
 
     if (result.success) {
@@ -134,7 +159,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       router.refresh();
     } else {
       toast.error(
-        result.error || `Failed to ${isEdit ? "update" : "create"} product`
+        result.error || `Failed to ${isEdit ? "update" : "create"} product`,
       );
     }
   };
@@ -248,6 +273,48 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             ))}
           </select>
         </div>
+
+        {/* Badges */}
+        {badges.length > 0 && (
+          <div className="space-y-2">
+            <Label>Product Badges</Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Select badges to display on this product
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {badges.map((badge) => (
+                <label
+                  key={badge.id}
+                  className="flex items-center gap-2 p-2 rounded-md border cursor-pointer hover:bg-accent transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedBadgeIds.includes(badge.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedBadgeIds([...selectedBadgeIds, badge.id]);
+                      } else {
+                        setSelectedBadgeIds(
+                          selectedBadgeIds.filter((id) => id !== badge.id),
+                        );
+                      }
+                    }}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <span
+                    className="text-xs px-2 py-1 rounded"
+                    style={{
+                      backgroundColor: badge.color,
+                      color: badge.textColor,
+                    }}
+                  >
+                    {badge.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Images */}

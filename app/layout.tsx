@@ -8,6 +8,8 @@ import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
 import { baseUrl } from "@/lib/utils";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",

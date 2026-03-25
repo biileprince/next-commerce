@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Mail,
@@ -28,7 +28,6 @@ type PhoneStep = "register" | "otp";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { data: session, isPending } = useSession();
 
   // Check if already logged in
@@ -62,8 +61,9 @@ export default function SignUpPage() {
   const [resendTimer, setResendTimer] = useState(0);
 
   useEffect(() => {
-    const mode = searchParams.get("mode");
-    const emailFromQuery = searchParams.get("email");
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("mode");
+    const emailFromQuery = params.get("email");
 
     if (mode !== "verify-email" || !emailFromQuery) return;
 
@@ -96,7 +96,7 @@ export default function SignUpPage() {
         setError("Failed to send verification code. Try resending.");
       }
     })();
-  }, [searchParams]);
+  }, []);
 
   // Resend timer countdown
   useEffect(() => {

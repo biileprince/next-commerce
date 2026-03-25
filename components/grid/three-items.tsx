@@ -66,8 +66,8 @@ export async function ThreeItemGrid() {
   // Need at least 3 products
   if (!products[0] || !products[1] || !products[2]) return null;
 
-  // Rotate hero products every 30 minutes and evaluate on each request.
-  const rotationWindow = Math.floor(Date.now() / (30 * 60 * 1000));
+  // Rotate hero products every 5 minutes and evaluate on each request.
+  const rotationWindow = Math.floor(Date.now() / (5 * 60 * 1000));
   const totalProducts = products.length;
 
   const firstIndex = rotationWindow % totalProducts;

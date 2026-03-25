@@ -4,6 +4,7 @@ import { FilterList } from "@/components/product/filter-list";
 import { FilterDropdown } from "@/components/layout/search/filter-dropdown";
 import { SORT_OPTIONS } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { Suspense } from "react";
 
 async function getCollectionsForMobile() {
   const categories = await prisma.category.findMany({
@@ -32,8 +33,12 @@ export default async function SearchLayout({
       {/* Mobile Filters */}
       <div className="sticky top-16 z-10 bg-white px-4 py-3 dark:bg-black md:hidden">
         <div className="grid grid-cols-2 gap-3">
-          <FilterDropdown list={collections} title="Collections" />
-          <FilterDropdown list={SORT_OPTIONS} title="Sort by" />
+          <Suspense fallback={<div className="h-10 w-full animate-pulse rounded-lg bg-neutral-200 dark:bg-neutral-800" />}>
+            <FilterDropdown list={collections} title="Collections" />
+          </Suspense>
+          <Suspense fallback={<div className="h-10 w-full animate-pulse rounded-lg bg-neutral-200 dark:bg-neutral-800" />}>
+            <FilterDropdown list={SORT_OPTIONS} title="Sort by" />
+          </Suspense>
         </div>
       </div>
 
@@ -46,7 +51,9 @@ export default async function SearchLayout({
           {children}
         </div>
         <div className="order-none flex-none md:order-last md:w-[200px] hidden md:block">
-          <FilterList list={SORT_OPTIONS} title="Sort by" />
+          <Suspense fallback={null}>
+            <FilterList list={SORT_OPTIONS} title="Sort by" />
+          </Suspense>
         </div>
       </div>
       <Footer />

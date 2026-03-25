@@ -63,7 +63,7 @@ async function ProductsContent({
   // Filter by category
   if (params.category) {
     products = products.filter(
-      (product) => product.category?.slug === params.category
+      (product) => product.category?.slug === params.category,
     );
   }
 
@@ -72,18 +72,18 @@ async function ProductsContent({
     switch (params.sort) {
       case "price-asc":
         products = [...products].sort(
-          (a, b) => Number(a.price) - Number(b.price)
+          (a, b) => Number(a.price) - Number(b.price),
         );
         break;
       case "price-desc":
         products = [...products].sort(
-          (a, b) => Number(b.price) - Number(a.price)
+          (a, b) => Number(b.price) - Number(a.price),
         );
         break;
       case "latest":
         products = [...products].sort(
           (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
         break;
     }
@@ -122,8 +122,12 @@ export default async function ProductsPage({
       {/* Mobile Filters */}
       <div className="sticky top-16 z-10 bg-white px-4 py-3 dark:bg-black md:hidden">
         <div className="grid grid-cols-2 gap-3">
-          <FilterDropdown list={collections} title="Collections" />
-          <FilterDropdown list={SORT_OPTIONS} title="Sort by" />
+          <Suspense fallback={null}>
+            <FilterDropdown list={collections} title="Collections" />
+          </Suspense>
+          <Suspense fallback={null}>
+            <FilterDropdown list={SORT_OPTIONS} title="Sort by" />
+          </Suspense>
         </div>
       </div>
 
@@ -150,7 +154,9 @@ export default async function ProductsPage({
 
         {/* Right Sidebar - Sort (Hidden on mobile) */}
         <div className="hidden md:block">
-          <FilterList list={SORT_OPTIONS} title="Sort by" />
+          <Suspense fallback={null}>
+            <FilterList list={SORT_OPTIONS} title="Sort by" />
+          </Suspense>
         </div>
       </div>
 

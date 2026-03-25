@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Grid } from "@/components/grid";
 import { ProductGridItems } from "@/components/product/product-grid-items";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchX } from "lucide-react";
 
 export const metadata = {
   title: "Search",
@@ -47,7 +48,7 @@ async function SearchResults({
     products = products.filter(
       (product) =>
         product.name.toLowerCase().includes(query) ||
-        product.description?.toLowerCase().includes(query)
+        product.description?.toLowerCase().includes(query),
     );
   }
 
@@ -63,7 +64,7 @@ async function SearchResults({
       case "newest":
         products.sort(
           (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
         break;
     }
@@ -73,7 +74,7 @@ async function SearchResults({
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔍</div>
+          <SearchX className="mx-auto mb-4 h-14 w-14 text-neutral-400" />
           <h2 className="text-2xl font-semibold mb-2">No products found</h2>
           <p className="text-neutral-500">
             {searchParams.q

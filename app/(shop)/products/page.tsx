@@ -9,6 +9,7 @@ import { FilterDropdown } from "@/components/layout/search/filter-dropdown";
 import { SORT_OPTIONS } from "@/lib/constants";
 import { Footer } from "@/components/layout/footer";
 import { prisma } from "@/lib/prisma";
+import { SearchX } from "lucide-react";
 
 export const metadata = {
   title: "All Products",
@@ -93,7 +94,7 @@ async function ProductsContent({
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center py-20">
-          <div className="text-6xl mb-4">📦</div>
+          <SearchX className="mx-auto mb-4 h-14 w-14 text-neutral-400" />
           <h2 className="text-2xl font-semibold mb-2">No products found</h2>
           <p className="text-neutral-500 dark:text-neutral-400">
             Try adjusting your filters

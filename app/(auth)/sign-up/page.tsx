@@ -111,17 +111,17 @@ export default function SignUpPage() {
                 {
                   onSuccess: () => {
                     setSuccess(
-                      "Account created! Enter the verification code sent to your email."
+                      "Account created! Enter the verification code sent to your email.",
                     );
                     setEmailStep("verify-otp");
                     setResendTimer(60);
                   },
                   onError: (ctx) => {
                     setError(
-                      ctx.error.message || "Failed to send verification code"
+                      ctx.error.message || "Failed to send verification code",
                     );
                   },
-                }
+                },
               );
             } catch {
               setError("Account created but failed to send verification code");
@@ -129,10 +129,11 @@ export default function SignUpPage() {
           },
           onError: (ctx) => {
             setError(
-              ctx.error.message || "Failed to create account. Please try again."
+              ctx.error.message ||
+                "Failed to create account. Please try again.",
             );
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -166,10 +167,10 @@ export default function SignUpPage() {
           },
           onError: (ctx) => {
             setError(
-              ctx.error.message || "Invalid or expired verification code"
+              ctx.error.message || "Invalid or expired verification code",
             );
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -197,7 +198,7 @@ export default function SignUpPage() {
           onError: (ctx) => {
             setError(ctx.error.message || "Failed to resend code");
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -233,7 +234,7 @@ export default function SignUpPage() {
           onError: (ctx) => {
             setError(ctx.error.message || "Failed to send OTP");
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -270,7 +271,7 @@ export default function SignUpPage() {
           onError: (ctx) => {
             setError(ctx.error.message || "Invalid OTP code");
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -297,7 +298,7 @@ export default function SignUpPage() {
           onError: (ctx) => {
             setError(ctx.error.message || "Failed to resend OTP");
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -466,7 +467,7 @@ export default function SignUpPage() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
+                    placeholder="Enter your name"
                     required
                     disabled={loading}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -482,7 +483,7 @@ export default function SignUpPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="john@example.com"
+                    placeholder="Enter your email"
                     required
                     disabled={loading}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -628,7 +629,7 @@ export default function SignUpPage() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
+                    placeholder="Enter your name"
                     required
                     disabled={loading}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"

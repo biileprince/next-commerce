@@ -87,7 +87,7 @@ export default function SignInPage() {
           onError: (ctx) => {
             setError(ctx.error.message || "Invalid email or password");
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -127,7 +127,7 @@ export default function SignInPage() {
           onError: (ctx) => {
             setError(ctx.error.message || "Invalid phone number or password");
           },
-        }
+        },
       );
     } catch {
       setError("An unexpected error occurred");
@@ -282,7 +282,7 @@ export default function SignInPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john@example.com"
+                  placeholder="Enter your email"
                   required
                   disabled={loading}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"

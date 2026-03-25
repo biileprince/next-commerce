@@ -40,7 +40,9 @@ export function UserStatusToggle({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showDialog, setShowDialog] = useState(false);
-  const [targetStatus, setTargetStatus] = useState<"active" | "suspended" | "banned">("active");
+  const [targetStatus, setTargetStatus] = useState<
+    "active" | "suspended" | "banned"
+  >("active");
   const [reason, setReason] = useState("");
 
   const handleStatusChange = (status: "active" | "suspended" | "banned") => {
@@ -68,7 +70,7 @@ export function UserStatusToggle({
       const result = await updateUserStatus(userId, targetStatus, reason);
       if (result.success) {
         toast.success(
-          `${userName} has been ${targetStatus === "suspended" ? "suspended" : "banned"}`
+          `${userName} has been ${targetStatus === "suspended" ? "suspended" : "banned"}`,
         );
         router.refresh();
       } else {
@@ -137,11 +139,13 @@ export function UserStatusToggle({
               {targetStatus === "suspended" ? "Suspend" : "Ban"} User
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to {targetStatus === "suspended" ? "suspend" : "ban"}{" "}
+              Are you sure you want to{" "}
+              {targetStatus === "suspended" ? "suspend" : "ban"}{" "}
               <span className="font-semibold">{userName}</span>?
               {targetStatus === "banned" && (
                 <span className="block mt-2 text-destructive">
-                  Banned users will not be able to access their account or make purchases.
+                  Banned users will not be able to access their account or make
+                  purchases.
                 </span>
               )}
             </AlertDialogDescription>

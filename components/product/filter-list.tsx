@@ -22,7 +22,8 @@ function PathFilterItem({ item }: { item: PathFilterItem }) {
   const currentCategory = searchParams.get("category");
 
   // Check if active based on category match
-  const active = itemCategory === currentCategory ||
+  const active =
+    itemCategory === currentCategory ||
     (item.path === "/products" && !currentCategory);
 
   // Build new URL preserving sort param
@@ -58,7 +59,8 @@ function SortFilterItem({ item }: { item: SortFilterItem }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentSort = searchParams.get("sort");
-  const active = currentSort === item.slug || (!currentSort && item.slug === null);
+  const active =
+    currentSort === item.slug || (!currentSort && item.slug === null);
 
   // Build new URL preserving category param
   const newParams = new URLSearchParams();

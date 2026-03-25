@@ -65,7 +65,9 @@ export function GuestCartContent() {
               <div className="flex flex-col items-center gap-3 sm:items-end">
                 <div className="flex h-9 items-center rounded-full border border-neutral-200 dark:border-neutral-700">
                   <button
-                    onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                    onClick={() =>
+                      updateItemQuantity(item.id, item.quantity - 1)
+                    }
                     disabled={item.quantity <= 1}
                     className="flex h-full w-9 items-center justify-center rounded-l-full transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-neutral-800"
                   >
@@ -75,7 +77,9 @@ export function GuestCartContent() {
                     {item.quantity}
                   </span>
                   <button
-                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                    onClick={() =>
+                      updateItemQuantity(item.id, item.quantity + 1)
+                    }
                     disabled={item.quantity >= item.product.stockQuantity}
                     className="flex h-full w-9 items-center justify-center rounded-r-full transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-neutral-800"
                   >
@@ -119,7 +123,9 @@ export function GuestCartContent() {
               <span className="text-neutral-600 dark:text-neutral-400">
                 Subtotal
               </span>
-              <span className="font-medium">{formatPrice(subtotal, "GHS")}</span>
+              <span className="font-medium">
+                {formatPrice(subtotal, "GHS")}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-neutral-600 dark:text-neutral-400">

@@ -20,13 +20,21 @@ export function OTPInput({
 }: OTPInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const getDigits = (rawValue: string) => {
+    const digits = rawValue.replace(/\D/g, "").slice(0, length).split("");
+    while (digits.length < length) {
+      digits.push("");
+    }
+    return digits;
+  };
+
   const handleChange = (index: number, newValue: string) => {
     // Only allow digits
     if (newValue && !/^\d+$/.test(newValue)) return;
 
-    const otpArray = value.split("");
-    otpArray[index] = newValue;
-    const newOtp = otpArray.join("");
+    const otpArray = getDigits(value);
+    otpArray[index] = newValue.slice(-1);
+    const newOtp = otpArray.join("").replace(/\s+/g, "");
 
     onChange(newOtp);
 
@@ -44,9 +52,9 @@ export function OTPInput({
         inputRefs.current[index - 1]?.focus();
       } else {
         // Clear current input
-        const otpArray = value.split("");
+        const otpArray = getDigits(value);
         otpArray[index] = "";
-        onChange(otpArray.join(""));
+        onChange(otpArray.join("").replace(/\s+/g, ""));
       }
     }
 
@@ -67,7 +75,7 @@ export function OTPInput({
     if (!/^\d+$/.test(pastedData)) return;
 
     // Take only the required length
-    const newValue = pastedData.slice(0, length);
+    const newValue = pastedData.replace(/\D/g, "").slice(0, length);
     onChange(newValue);
 
     // Focus the next empty input or the last input

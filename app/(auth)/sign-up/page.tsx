@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Mail,
@@ -28,6 +28,7 @@ type PhoneStep = "register" | "otp";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, isPending } = useSession();
 
   // Check if already logged in
@@ -59,6 +60,43 @@ export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+    const mode = searchParams.get("mode");
+    const emailFromQuery = searchParams.get("email");
+
+    if (mode !== "verify-email" || !emailFromQuery) return;
+
+    const normalizedEmail = emailFromQuery.trim().toLowerCase();
+    setMethod("email");
+    setEmail(normalizedEmail);
+    setEmailStep("verify-otp");
+    setSuccess("Your email is not verified. Enter the code sent to your email.");
+    setError(null);
+
+    // Auto-send a fresh code if user came from sign-in unverified flow.
+    (async () => {
+      try {
+        await authClient.emailOtp.sendVerificationOtp(
+          {
+            email: normalizedEmail,
+            type: "email-verification",
+          },
+          {
+            onSuccess: () => {
+              setSuccess("Verification code sent. Check your email.");
+              setResendTimer(60);
+            },
+            onError: (ctx) => {
+              setError(ctx.error.message || "Failed to send verification code");
+            },
+          },
+        );
+      } catch {
+        setError("Failed to send verification code. Try resending.");
+      }
+    })();
+  }, [searchParams]);
 
   // Resend timer countdown
   useEffect(() => {
@@ -146,7 +184,9 @@ export default function SignUpPage() {
   async function handleVerifyEmailOTP(e: React.FormEvent) {
     e.preventDefault();
 
-    if (emailOtp.length !== 6) {
+    const sanitizedOtp = emailOtp.replace(/\D/g, "").trim();
+
+    if (sanitizedOtp.length !== 6) {
       setError("Please enter the complete 6-digit code");
       return;
     }
@@ -158,7 +198,7 @@ export default function SignUpPage() {
       await authClient.emailOtp.verifyEmail(
         {
           email,
-          otp: emailOtp,
+          otp: sanitizedOtp,
         },
         {
           onSuccess: () => {

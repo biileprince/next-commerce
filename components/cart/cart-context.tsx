@@ -168,37 +168,40 @@ export function CartProvider({ children, initialCart }: CartProviderProps) {
     [],
   );
 
-  const removeItem = useCallback(async (cartItemId: string) => {
-    if (cart?.userId === "guest") {
-      setCart((prev) => {
-        if (!prev) return prev;
-        const updatedCart: Cart = {
-          ...prev,
-          updatedAt: new Date(),
-          items: prev.items.filter((item) => item.id !== cartItemId),
-        };
-        persistGuestCart(updatedCart.items.length ? updatedCart : null);
-        return updatedCart.items.length ? updatedCart : null;
-      });
-      return;
-    }
-
-    try {
-      const { removeFromCart } = await import("@/lib/actions/cart");
-      const result = await removeFromCart(cartItemId);
-      if (result.success) {
+  const removeItem = useCallback(
+    async (cartItemId: string) => {
+      if (cart?.userId === "guest") {
         setCart((prev) => {
           if (!prev) return prev;
-          return {
+          const updatedCart: Cart = {
             ...prev,
+            updatedAt: new Date(),
             items: prev.items.filter((item) => item.id !== cartItemId),
           };
+          persistGuestCart(updatedCart.items.length ? updatedCart : null);
+          return updatedCart.items.length ? updatedCart : null;
         });
+        return;
       }
-    } catch (error) {
-      console.error("Failed to remove item:", error);
-    }
-  }, [cart?.userId]);
+
+      try {
+        const { removeFromCart } = await import("@/lib/actions/cart");
+        const result = await removeFromCart(cartItemId);
+        if (result.success) {
+          setCart((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              items: prev.items.filter((item) => item.id !== cartItemId),
+            };
+          });
+        }
+      } catch (error) {
+        console.error("Failed to remove item:", error);
+      }
+    },
+    [cart?.userId],
+  );
 
   const updateItemQuantity = useCallback(
     async (cartItemId: string, quantity: number) => {
@@ -238,7 +241,7 @@ export function CartProvider({ children, initialCart }: CartProviderProps) {
             return {
               ...prev,
               items: prev.items.map((item) =>
-                item.id === cartItemId ? { ...item, quantity } : item
+                item.id === cartItemId ? { ...item, quantity } : item,
               ),
             };
           });
@@ -277,7 +280,7 @@ export function CartProvider({ children, initialCart }: CartProviderProps) {
     if (!cart) return 0;
     return cart.items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
-      0
+      0,
     );
   }, [cart]);
 

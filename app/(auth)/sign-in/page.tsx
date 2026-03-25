@@ -85,7 +85,18 @@ export default function SignInPage() {
             }
           },
           onError: (ctx) => {
-            setError(ctx.error.message || "Invalid email or password");
+            const message = ctx.error.message || "Invalid email or password";
+
+            if (
+              message.toLowerCase().includes("not verified") ||
+              message.toLowerCase().includes("email is not verified")
+            ) {
+              const verifyUrl = `/sign-up?mode=verify-email&email=${encodeURIComponent(email)}`;
+              router.push(verifyUrl);
+              return;
+            }
+
+            setError(message);
           },
         },
       );
